@@ -227,6 +227,20 @@ html[lang="ko"] .lng [data-l="ko"], html[lang="en"] .lng [data-l="en"]{opacity:1
 .g-item figcaption b{font-weight:400;font-size:15px}
 .g-item figcaption .s{font-size:13px;color:var(--sky-ink)}
 .list{border-top:1px solid var(--line)}
+/* overview: a contact sheet — every work at a glance */
+.sheet{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:clamp(10px,1.2vw,16px)}
+.s-item{all:unset;position:relative;display:block;cursor:zoom-in;overflow:hidden;background:rgba(232,228,220,.04)}
+.s-item .th{aspect-ratio:1;background-size:cover;background-position:center}
+.s-item .th img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 1.4s var(--ease),filter .8s}
+.s-item:hover .th img,.s-item:focus-visible .th img{transform:scale(1.05);filter:brightness(.8)}
+.s-item .cap{position:absolute;left:0;right:0;bottom:0;padding:34px 10px 9px;background:linear-gradient(transparent,rgba(13,16,23,.88));display:grid;gap:2px;opacity:0;transform:translateY(6px);transition:opacity .5s,transform .5s var(--ease)}
+.s-item:hover .cap,.s-item:focus-visible .cap{opacity:1;transform:none}
+.s-item .cap .no{font-size:11px;color:var(--ink-soft)}
+.s-item .cap b{font-weight:400;font-size:13px;line-height:1.35;color:var(--ink)}
+.s-item .mvd{position:absolute;top:8px;right:8px;width:22px;height:22px;border-radius:50%;background:rgba(13,16,23,.6);display:grid;place-items:center}
+.s-item .mvd::before{content:"";margin-left:2px;border-left:7px solid var(--ink);border-top:4.5px solid transparent;border-bottom:4.5px solid transparent}
+.s-item:focus-visible{outline:1px solid var(--sky);outline-offset:3px}
+@media (max-width:560px){.sheet{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}}
 .l-row{display:grid;grid-template-columns:70px 60px minmax(0,1.2fr) 90px minmax(0,1.6fr);gap:20px;align-items:center;padding-block:14px;border-bottom:1px solid var(--line);cursor:zoom-in;transition:background .5s}
 .l-row:hover,.l-row:focus-visible{background:rgba(232,228,220,.03)}
 .l-row .th{width:60px;height:46px;background-size:cover}
@@ -545,14 +559,17 @@ hydrate($('#roomsWrap'));
   vs.forEach(v=>io.observe(v)); })();
 
 /* ---- Catalogue ---- */
-let curSeries = 'all', curView = 'grid';
+let curSeries = 'all', curView = 'sheet';
 $('#segSeries').innerHTML = [['all',bi('전체','All')],...SERIES.map(s=>[s.id,T.room(s)])].map(([id,t])=>`<li><button type="button" data-v="${id}" aria-pressed="${id===curSeries}">${t}</button></li>`).join('');
-$('#segView').innerHTML = [['grid',bi('갤러리','Gallery')],['list',bi('목록','List')]].map(([id,t])=>`<li><button type="button" data-v="${id}" aria-pressed="${id===curView}">${t}</button></li>`).join('');
+$('#segView').innerHTML = [['sheet',bi('모아보기','Overview')],['grid',bi('크게 보기','Large')],['list',bi('목록','List')]].map(([id,t])=>`<li><button type="button" data-v="${id}" aria-pressed="${id===curView}">${t}</button></li>`).join('');
 const visible = () => (curSeries==='all' ? WORKS : byId(curSeries)).slice().sort((a,b)=>a.no-b.no);
 function renderCatalogue(){
   const list = visible(), el = $('#catalogue');
   if (!list.length){ el.className='grid'; el.innerHTML = `<div class="empty">${bi('아직 걸린 작품이 없어요.','No works here yet.')}</div>`; return; }
-  if (curView==='list'){
+  if (curView==='sheet'){
+    el.className = 'sheet';
+    el.innerHTML = list.map(w=>`<button type="button" class="s-item" data-no="${w.no}" data-set="cat" aria-label="${no(w)} ${w.title} 크게 보기"><div class="th"><img src="${small(w)}" alt="" loading="lazy"></div>${w.video ? '<span class="mvd" aria-hidden="true"></span>' : ''}<span class="cap"><span class="no">${no(w)}</span><b>${T.title(w)}</b></span></button>`).join('');
+  } else if (curView==='list'){
     el.className = 'list';
     el.innerHTML = list.map(w=>`<div class="l-row" role="button" tabindex="0" data-no="${w.no}" data-set="cat" aria-label="${w.title} 크게 보기"><span class="no">${no(w)}</span><div class="th"><img src="${small(w)}" alt="" loading="lazy"></div><b>${T.title(w)}</b><span class="s">${T.sym(w)}</span><span class="v">${T.line(w)}</span></div>`).join('');
   } else {
@@ -590,7 +607,7 @@ function openLB(set, n){ lbSet = set; lbI = Math.max(0, set.findIndex(w=>w.no===
 function closeLB(){ $('#lbVid').pause(); lb.hidden = true; if(window.lenis) lenis.start(); lastFocus && lastFocus.focus(); }
 function step(d){ lbI = (lbI + d + lbSet.length) % lbSet.length; showLB(); if(hasGSAP && !reduce) gsap.fromTo('#lbImg, #lbVid',{opacity:0},{opacity:1,duration:1,ease:'power2.out'}); }
 const setFor = el => el.dataset.set==='cat' ? visible() : byId(el.dataset.set);
-document.addEventListener('click', e=>{ const v = e.target.closest('[data-view], .g-item, .l-row'); if(!v) return; const f = v.closest('[data-no]'); if(!f) return; openLB(setFor(f), +f.dataset.no); });
+document.addEventListener('click', e=>{ const v = e.target.closest('[data-view], .g-item, .l-row, .s-item'); if(!v) return; const f = v.closest('[data-no]'); if(!f) return; openLB(setFor(f), +f.dataset.no); });
 document.addEventListener('keydown', e=>{
   if(!lb.hidden){ if(e.key==='Escape') closeLB(); if(e.key==='ArrowRight') step(1); if(e.key==='ArrowLeft') step(-1); return; }
   const f = e.target.closest && e.target.closest('.g-item, .l-row'); if(f && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); openLB(setFor(f), +f.dataset.no); }
