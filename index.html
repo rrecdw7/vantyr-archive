@@ -6,6 +6,15 @@
 <meta name="description" content="Vantyr가 직접 찍은 사진을, 사진마다 품은 한 단어와 한 문장과 함께 걸어 두는 작은 전시관.">
 <meta property="og:title" content="Vantyr Archive">
 <meta property="og:description" content="Photographs by Vantyr — 머물렀던 자리에 남은 빛을 한 장씩 걸어 둡니다.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://vantyr-archive.vercel.app/">
+<meta property="og:image" content="https://vantyr-archive.vercel.app/photos/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="ko_KR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://vantyr-archive.vercel.app/photos/og.jpg">
+<meta name="theme-color" content="#0D1017">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230D1017'/%3E%3Cline x1='8' y1='34' x2='56' y2='34' stroke='%2393BCE6' stroke-width='2'/%3E%3Ctext x='32' y='28' font-family='Georgia,serif' font-size='26' fill='%23E8E4DC' text-anchor='middle'%3EV%3C/text%3E%3C/svg%3E">
 <title>Vantyr Archive</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,6 +35,8 @@
   --f-display:"Cormorant Garamond","Times New Roman",serif;
   --f-kr:"Noto Serif KR","AppleMyungjo","Batang",serif;
   --gutter:clamp(20px,6vw,96px);
+  --mat:clamp(7px,.85vw,14px);  /* ivory mat around each print */
+  --mat-c:#E7E2D8;
   --ease:cubic-bezier(.22,1,.36,1);
   color-scheme:dark;
 }
@@ -125,6 +136,18 @@ a.ri-row:hover .t{transform:translateX(10px)}
 .piece{min-height:100svh;margin:0;display:grid;place-content:center;justify-items:center;padding-block:clamp(64px,9vh,104px) clamp(40px,6vh,80px);gap:26px;text-align:center}
 .piece .frame{position:relative;cursor:zoom-in;background-color:rgba(232,228,220,.04);background-size:cover;background-position:center;aspect-ratio:var(--r);height:min(58svh,calc((100vw - 2*var(--gutter)) / var(--r)));max-width:min(1200px,calc(100vw - 2*var(--gutter)))}
 .piece .frame img{width:100%;height:100%;object-fit:contain}
+.piece .frame,.g-item .frame{box-shadow:0 0 0 var(--mat) var(--mat-c),0 0 0 calc(var(--mat) + 1px) rgba(0,0,0,.25),0 calc(var(--mat) + 28px) 70px -24px rgba(0,0,0,.75)}
+/* rhythm: a work hung large */
+.piece.large .frame{height:min(74svh,calc((100vw - 2*var(--gutter)) / var(--r)));max-width:min(1560px,calc(100vw - 2*var(--gutter)))}
+/* rhythm: two works that rhyme, side by side */
+.pair-frames{display:flex;justify-content:center;align-items:flex-start;gap:clamp(36px,5vw,88px)}
+.half{margin:0;display:grid;justify-items:center;gap:26px}
+.half .frame{height:var(--h);aspect-ratio:var(--r)}
+.half .caption{max-width:26ch}
+.half .verse{font-size:clamp(16px,1.45vw,19px)}
+/* rhythm: a pause with only words */
+.pause{min-height:72svh;display:grid;place-content:center;text-align:center;padding-block:80px}
+.pause p{margin:0;font-weight:300;font-size:clamp(22px,2.6vw,34px);line-height:1.7;color:var(--ink-soft);max-width:22ch;text-wrap:balance}
 .caption{display:grid;justify-items:center;gap:8px;max-width:44ch}
 .sym{font-size:15px;letter-spacing:.12em;color:var(--sky-ink)}
 .verse{margin:0;font-weight:300;font-size:clamp(19px,1.9vw,24px);line-height:1.65;text-wrap:balance}
@@ -213,6 +236,9 @@ footer small{color:var(--ink-soft);font-size:13px}
   .ri-row .t em{display:block;margin:2px 0 0}
   .piece{padding-block:72px;gap:26px}
   .piece .frame{height:auto;width:calc(100vw - 2*var(--gutter));max-height:72svh}
+  .pair-frames{flex-direction:column;align-items:center;gap:72px}
+  .half .frame{height:auto;width:calc(100vw - 2*var(--gutter));max-height:64svh}
+  :root{--mat:6px}
   .grid{row-gap:64px}
   .g-a,.g-c,.g-e{grid-column:1/-1}
   .g-b,.g-d{grid-column:3/-1}
@@ -313,31 +339,34 @@ footer small{color:var(--ink-soft);font-size:13px}
    WORKS  : 작품 (sym = 상징하는 단어, line = 한 줄, note = 그때의 기억)
    ========================================================= */
 const SERIES = [
-  {id:'sea',     no:'I',   title:'바다와 바람',   en:'Sea & Wind',      epigraph:'바람을 맞으며, 파도와 같이 있던 오후.'},
-  {id:'transit', no:'II',  title:'이동하는 순간', en:'In Transit',      epigraph:'어딘가로 향하는 동안에만 보이는 풍경이 있다.'},
+  {id:'sea',     no:'I',   title:'바다와 바람',   en:'Sea & Wind',      epigraph:'바람을 맞으며, 파도와 같이 있던 오후.', pause:'같은 바다라도, 바람이 다르면 다른 사진이 된다.'},
+  {id:'transit', no:'II',  title:'이동하는 순간', en:'In Transit',      epigraph:'어딘가로 향하는 동안에만 보이는 풍경이 있다.', pause:'비몽사몽한 대합실에서, 설렘이 가득했던 길까지.'},
   {id:'night',   no:'III', title:'밤의 거리',     en:'After Dark',      epigraph:'불이 꺼진 뒤에야 보이는 길.'},
   {id:'lines',   no:'IV',  title:'소실점',        en:'Vanishing Point', epigraph:'모든 길은 결국 한 점으로 모인다.'},
 ];
 const NEXT_ROOM = {no:'V', note:'새로 찍은 사진이 모이면 열립니다'};
+/* 전시 리듬: 나란히 걸 두 작품(서로 닮은 사진), 크게 걸 작품 */
+const PAIRS = [[5,9],[2,3],[15,18]];
+const LARGE = [7,1,13];
 const WORKS = [
-  {no:1,  series:'transit', src:'photos/airport.jpg',    r:.99,   title:'떠나기 전',          place:'공항',          date:'2026.10.27', sym:'경계',     line:'떠나는 순간은 늘 창문 너머에서 먼저 시작된다.',      note:'비몽사몽, 멍하니 앉아 있던 대합실', alt:'공항 대합실 창 너머로 보이는 산과 활주로'},
-  {no:2,  series:'transit', src:'photos/cabin.jpg',      r:.753,  title:'기내',              place:'비행기 안',      date:'2026.10.27', sym:'귀환',     line:'다시 왔다는 건, 한 번은 떠났었다는 뜻이다.',        note:'제주에 다시 왔구나, 실감한 순간', alt:'승객들이 짐을 정리하는 비행기 기내'},
-  {no:3,  series:'transit', src:'photos/bus.jpg',        r:.753,  title:'이동하는 길',        place:'버스 안',        date:'2026.10.27', sym:'설렘',     line:'도착보다 먼저 오는 것이 있다. 가는 길의 두근거림.',  note:'설렘이 가득했던 길', alt:'주황색 커튼이 달린 관광버스 내부'},
-  {no:4,  series:'transit', src:'photos/show.jpg',       r:1,     title:'오후의 공연',        place:'제주',          date:'2026.10.27', sym:'의외',     line:'기대하지 않은 곳에서 가장 오래 남는 장면이 온다.',   note:'기대보다 훨씬 재밌었던 공연', alt:'숲을 배경으로 말을 탄 배우들이 펼치는 야외 공연'},
-  {no:5,  series:'sea',     src:'photos/biyangdo.jpg',   r:1,     title:'비양도가 보이는 오후', place:'제주 협재',      date:'2026.10.27', sym:'거리',     line:'닿을 수 없어서 더 선명한 섬.',                   note:'바람을 맞으며 파도와 함께', alt:'에메랄드빛 파도 너머로 보이는 비양도'},
-  {no:6,  series:'sea',     src:'photos/turbines.jpg',   r:.754,  title:'바다 위의 바람개비',  place:'제주 서쪽 바다',  date:'2026.10.27', sym:'바람',     line:'보이지 않는 것이 가장 많은 것을 움직인다.',         note:'', alt:'현무암 해안 너머 수평선에 늘어선 해상 풍력발전기'},
-  {no:7,  series:'sea',     src:'photos/waves.jpg',      r:1.327, title:'밀려오는 것들',      place:'제주 바다',      date:'2026.10.27', sym:'반복',     line:'파도는 한 번도 같은 모양으로 돌아오지 않는다.',      note:'바람을 맞으며 파도와 함께', alt:'하얗게 부서지는 파도와 멀리 보이는 풍력발전기'},
-  {no:8,  series:'sea',     src:'photos/hyeopjae.jpg',   r:1,     title:'구름이 낮던 날',      place:'제주 협재',      date:'2026.10.27', sym:'동화',     line:'현실이 잠깐 그림처럼 보이는 순간이 있다.',         note:'애니메이션 속 한 장면 같던 색감, 보자마자 이거다 싶었던 순간', alt:'구름이 낮게 깔린 협재 해변과 현무암 해안', featured:true},
-  {no:9,  series:'sea',     src:'photos/island.jpg',     r:1,     title:'섬이 보이는 언덕',     place:'제주',          date:'2026.10.28', sym:'고요',     line:'아무 일도 없던 오후가 가장 오래 기억된다.',         note:'', alt:'잔디 언덕과 야자수 너머로 보이는 푸른 바다와 작은 섬'},
-  {no:10, series:'transit', src:'photos/flight.jpg',     r:1,     title:'돌아오는 하늘',       place:'비행기 안',      date:'2026.10.28', sym:'끝과 시작', line:'노을은 하루의 끝이면서, 돌아갈 곳의 시작이다.',      note:'', alt:'어두운 비행기 창 너머 수평선에 남은 주황빛 노을'},
-  {no:11, series:'sea',     src:'photos/beachwalk.jpg',  r:1,     title:'바다를 걷는 사람',    place:'바닷가',        date:'', sym:'걸음',     line:'바다 앞에서는 누구나 조금 천천히 걷는다.',          note:'', alt:'맑은 하늘 아래 파도가 밀려오는 모래사장을 걷는 사람'},
-  {no:12, series:'night',   src:'photos/schoolzone.jpg', r:.75,   title:'200m 앞',           place:'밤의 동네 길',   date:'', sym:'예감',     line:'가장 조용한 길에도 다가오는 무언가가 있다.',         note:'', alt:'가로등과 은행나무가 늘어선 밤의 어린이보호구역 도로와 200m 표지판'},
-  {no:13, series:'night',   src:'photos/taillights.jpg', r:1.333, title:'멀어지는 불빛',       place:'밤길',          date:'', sym:'이별',     line:'멀어지는 것들은 늘 붉은빛을 남긴다.',              note:'', alt:'어둠 속에서 흔들리며 멀어지는 자동차의 붉은 후미등'},
-  {no:14, series:'transit', src:'photos/bridge.jpg',     r:.75,   title:'구름 쪽으로',         place:'다리 위',        date:'', sym:'향함',     line:'길은 끝나도, 하늘은 계속 이어진다.',               note:'', alt:'거대한 구름을 향해 다리 위를 달리는 자동차와 오토바이'},
-  {no:15, series:'lines',   src:'photos/corridor.jpg',   r:1.097, title:'붉은 기둥 사이',      place:'회랑',          date:'', sym:'통로',     line:'끝에는 언제나 빛이 기다리고 있다.',                note:'', alt:'붉은 기둥과 단청이 끝까지 이어지다 빛으로 열리는 긴 회랑'},
-  {no:16, series:'night',   src:'photos/parklamp.jpg',   r:.75,   title:'가로등 아래 계단',     place:'밤의 공원',      date:'', sym:'홀로',     line:'어둠이 깊을수록 하나의 빛이 길이 된다.',            note:'', alt:'앙상한 나무 사이 가로등 하나가 비추는 밤 공원의 계단'},
-  {no:17, series:'transit', src:'photos/bluebus.jpg',    r:1.333, title:'파란 버스',          place:'시골길',        date:'', sym:'일상',     line:'매일 지나가는 것이 어느 날 장면이 된다.',            note:'', alt:'앙상한 나무가 선 시골길을 달려오는 파란 버스'},
-  {no:18, series:'lines',   src:'photos/alley.jpg',      r:1.333, title:'틈',                place:'골목',          date:'', sym:'틈',       line:'벽과 벽 사이에도 길은 난다.',                     note:'', alt:'낡은 벽 두 개 사이로 좁게 난 골목길'},
+  {no:1,  series:'transit', src:'photos/airport.jpg', hd:true,    r:.99,   title:'떠나기 전',          place:'공항',          date:'2026.10.27', sym:'경계',     line:'떠나는 순간은 늘 창문 너머에서 먼저 시작된다.',      note:'비몽사몽, 멍하니 앉아 있던 대합실', alt:'공항 대합실 창 너머로 보이는 산과 활주로'},
+  {no:2,  series:'transit', src:'photos/cabin.jpg', hd:true,      r:.753,  title:'기내',              place:'비행기 안',      date:'2026.10.27', sym:'귀환',     line:'다시 왔다는 건, 한 번은 떠났었다는 뜻이다.',        note:'제주에 다시 왔구나, 실감한 순간', alt:'승객들이 짐을 정리하는 비행기 기내'},
+  {no:3,  series:'transit', src:'photos/bus.jpg', hd:true,        r:.753,  title:'이동하는 길',        place:'버스 안',        date:'2026.10.27', sym:'설렘',     line:'도착보다 먼저 오는 것이 있다. 가는 길의 두근거림.',  note:'설렘이 가득했던 길', alt:'주황색 커튼이 달린 관광버스 내부'},
+  {no:4,  series:'transit', src:'photos/show.jpg', hd:true,       r:1,     title:'오후의 공연',        place:'제주',          date:'2026.10.27', sym:'의외',     line:'기대하지 않은 곳에서 가장 오래 남는 장면이 온다.',   note:'기대보다 훨씬 재밌었던 공연', alt:'숲을 배경으로 말을 탄 배우들이 펼치는 야외 공연'},
+  {no:5,  series:'sea',     src:'photos/biyangdo.jpg', hd:true,   r:1,     title:'비양도가 보이는 오후', place:'제주 협재',      date:'2026.10.27', sym:'거리',     line:'닿을 수 없어서 더 선명한 섬.',                   note:'바람을 맞으며 파도와 함께', alt:'에메랄드빛 파도 너머로 보이는 비양도'},
+  {no:6,  series:'sea',     src:'photos/turbines.jpg', hd:true,   r:.754,  title:'바다 위의 바람개비',  place:'제주 서쪽 바다',  date:'2026.10.27', sym:'바람',     line:'보이지 않는 것이 가장 많은 것을 움직인다.',         note:'', alt:'현무암 해안 너머 수평선에 늘어선 해상 풍력발전기'},
+  {no:7,  series:'sea',     src:'photos/waves.jpg', hd:true,      r:1.327, title:'밀려오는 것들',      place:'제주 바다',      date:'2026.10.27', sym:'반복',     line:'파도는 한 번도 같은 모양으로 돌아오지 않는다.',      note:'바람을 맞으며 파도와 함께', alt:'하얗게 부서지는 파도와 멀리 보이는 풍력발전기'},
+  {no:8,  series:'sea',     src:'photos/hyeopjae.jpg', hd:true,   r:1,     title:'구름이 낮던 날',      place:'제주 협재',      date:'2026.10.27', sym:'동화',     line:'현실이 잠깐 그림처럼 보이는 순간이 있다.',         note:'애니메이션 속 한 장면 같던 색감, 보자마자 이거다 싶었던 순간', alt:'구름이 낮게 깔린 협재 해변과 현무암 해안', featured:true},
+  {no:9,  series:'sea',     src:'photos/island.jpg', hd:true,     r:1,     title:'섬이 보이는 언덕',     place:'제주',          date:'2026.10.28', sym:'고요',     line:'아무 일도 없던 오후가 가장 오래 기억된다.',         note:'', alt:'잔디 언덕과 야자수 너머로 보이는 푸른 바다와 작은 섬'},
+  {no:10, series:'transit', src:'photos/flight.jpg', hd:true,     r:1,     title:'돌아오는 하늘',       place:'비행기 안',      date:'2026.10.28', sym:'끝과 시작', line:'노을은 하루의 끝이면서, 돌아갈 곳의 시작이다.',      note:'', alt:'어두운 비행기 창 너머 수평선에 남은 주황빛 노을'},
+  {no:11, series:'sea',     src:'photos/beachwalk.jpg', hd:true,  r:1,     title:'바다를 걷는 사람',    place:'바닷가',        date:'', sym:'걸음',     line:'바다 앞에서는 누구나 조금 천천히 걷는다.',          note:'', alt:'맑은 하늘 아래 파도가 밀려오는 모래사장을 걷는 사람'},
+  {no:12, series:'night',   src:'photos/schoolzone.jpg', hd:true, r:.75,   title:'200m 앞',           place:'밤의 동네 길',   date:'', sym:'예감',     line:'가장 조용한 길에도 다가오는 무언가가 있다.',         note:'', alt:'가로등과 은행나무가 늘어선 밤의 어린이보호구역 도로와 200m 표지판'},
+  {no:13, series:'night',   src:'photos/taillights.jpg', hd:true, r:1.333, title:'멀어지는 불빛',       place:'밤길',          date:'', sym:'이별',     line:'멀어지는 것들은 늘 붉은빛을 남긴다.',              note:'', alt:'어둠 속에서 흔들리며 멀어지는 자동차의 붉은 후미등'},
+  {no:14, series:'transit', src:'photos/bridge.jpg', hd:true,     r:.75,   title:'구름 쪽으로',         place:'다리 위',        date:'', sym:'향함',     line:'길은 끝나도, 하늘은 계속 이어진다.',               note:'', alt:'거대한 구름을 향해 다리 위를 달리는 자동차와 오토바이'},
+  {no:15, series:'lines',   src:'photos/corridor.jpg', hd:true,   r:1.097, title:'붉은 기둥 사이',      place:'회랑',          date:'', sym:'통로',     line:'끝에는 언제나 빛이 기다리고 있다.',                note:'', alt:'붉은 기둥과 단청이 끝까지 이어지다 빛으로 열리는 긴 회랑'},
+  {no:16, series:'night',   src:'photos/parklamp.jpg', hd:true,   r:.75,   title:'가로등 아래 계단',     place:'밤의 공원',      date:'', sym:'홀로',     line:'어둠이 깊을수록 하나의 빛이 길이 된다.',            note:'', alt:'앙상한 나무 사이 가로등 하나가 비추는 밤 공원의 계단'},
+  {no:17, series:'transit', src:'photos/bluebus.jpg', hd:true,    r:1.333, title:'파란 버스',          place:'시골길',        date:'', sym:'일상',     line:'매일 지나가는 것이 어느 날 장면이 된다.',            note:'', alt:'앙상한 나무가 선 시골길을 달려오는 파란 버스'},
+  {no:18, series:'lines',   src:'photos/alley.jpg', hd:true,      r:1.333, title:'틈',                place:'골목',          date:'', sym:'틈',       line:'벽과 벽 사이에도 길은 난다.',                     note:'', alt:'낡은 벽 두 개 사이로 좁게 난 골목길'},
 ];
 
 document.documentElement.classList.add('js');
@@ -352,18 +381,23 @@ const byId = id => WORKS.filter(w=>w.series===id).sort((a,b)=>a.no-b.no);
 const latest = [...WORKS].sort((a,b)=>b.no-a.no);
 const featured = WORKS.find(w=>w.featured) || latest[0];
 const metaLine = w => [w.place, w.date].filter(Boolean).join(' · ');
+/* hd:true 작품은 photos/이름-1200.webp, 이름-2400.webp 를 화면 크기에 맞춰 불러와요 */
+const base = w => w.src.replace(/\.jpg$/,'');
+const img = (w, sizes) => w.hd ? `src="${base(w)}-1200.webp" srcset="${base(w)}-1200.webp 1200w, ${base(w)}-2400.webp 2400w" sizes="${sizes}"` : `src="${w.src}"`;
+const full = w => w.hd ? `${base(w)}-2400.webp` : w.src;
+const small = w => w.hd ? `${base(w)}-1200.webp` : w.src;
 
 function hydrate(root){
-  root.querySelectorAll('.frame img, .th img').forEach(img=>{
-    const f = img.parentElement, key = img.getAttribute('src').split('/').pop().replace('.jpg','');
+  root.querySelectorAll('.frame img, .th img').forEach(im=>{ const img = im;
+    const f = img.parentElement, key = img.getAttribute('src').split('/').pop().replace(/(-\d+)?\.(jpg|webp)$/,'');
     if (LQ[key]) f.style.backgroundImage = `url(${LQ[key]})`;
     const done = ()=>{ img.classList.add('loaded'); setTimeout(()=>f.style.backgroundImage='none',1300); };
     if (img.complete && img.naturalWidth) done(); else { img.addEventListener('load',done,{once:true}); img.addEventListener('error',done,{once:true}); }
-  });
-}
+  }); }
 
 /* ---- Hero ---- */
-$('#heroImg').src = featured.src; $('#heroImg').alt = featured.alt;
+if (featured.hd){ $('#heroImg').srcset = `${base(featured)}-1200.webp 1200w, ${base(featured)}-2400.webp 2400w`; $('#heroImg').sizes = '100vw'; }
+$('#heroImg').src = featured.hd ? `${base(featured)}-2400.webp` : featured.src; $('#heroImg').alt = featured.alt;
 $('#heroFoot').innerHTML = `<b>${featured.title}</b><span>「${featured.sym}」 ${featured.line}</span>`;
 
 /* ---- Rooms index ---- */
@@ -371,14 +405,27 @@ $('#riList').innerHTML = SERIES.map(s=>`<li><a class="ri-row" href="#room-${s.id
   + `<li><div class="ri-row soon"><span class="no">${NEXT_ROOM.no}.</span><span class="t">다음 전시실</span><span class="m">${NEXT_ROOM.note}</span></div></li>`;
 
 /* ---- Rooms ---- */
-const pieceHTML = w => `<figure class="piece" data-no="${w.no}" data-set="${w.series}">
-  <div class="frame" style="--r:${w.r}" data-view><img src="${w.src}" alt="${w.alt}" loading="lazy"></div>
-  <figcaption class="caption"><span class="sym">「${w.sym}」</span><p class="verse">${w.line}</p><span class="meta"><span class="no">${no(w)}</span>${w.title}${metaLine(w) ? ' · ' + metaLine(w) : ''}</span></figcaption>
-</figure>`;
+const captionHTML = w => `<figcaption class="caption"><span class="sym">「${w.sym}」</span><p class="verse">${w.line}</p><span class="meta"><span class="no">${no(w)}</span>${w.title}${metaLine(w) ? ' · ' + metaLine(w) : ''}</span></figcaption>`;
+const pieceHTML = w => { const big = LARGE.includes(w.no);
+  return `<figure class="piece${big ? ' large' : ''}" data-no="${w.no}" data-set="${w.series}">
+  <div class="frame" style="--r:${w.r}" data-view><img ${img(w, big ? '(max-width:900px) 92vw, 80vw' : '(max-width:900px) 92vw, 60vw')} alt="${w.alt}" loading="lazy"></div>
+  ${captionHTML(w)}
+</figure>`; };
+const pairHTML = (a,b) => `<div class="piece pair"><div class="pair-frames" style="--h:min(52svh, calc((100vw - 2*var(--gutter) - 88px) / ${(a.r+b.r).toFixed(3)}))">
+  ${[a,b].map(w=>`<figure class="half" data-no="${w.no}" data-set="${w.series}"><div class="frame" style="--r:${w.r}" data-view><img ${img(w,'(max-width:900px) 92vw, 40vw')} alt="${w.alt}" loading="lazy"></div>${captionHTML(w)}</figure>`).join('')}
+</div></div>`;
+function roomUnits(s){
+  const ws = byId(s.id), used = new Set(), units = [];
+  ws.forEach(w=>{ if (used.has(w.no)) return;
+    const pr = PAIRS.find(p=>p[0]===w.no || p[1]===w.no), mate = pr && ws.find(x=>x.no===(pr[0]===w.no ? pr[1] : pr[0]));
+    if (mate){ used.add(w.no); used.add(mate.no); units.push(pairHTML(w, mate)); } else { used.add(w.no); units.push(pieceHTML(w)); } });
+  if (s.pause && units.length >= 4) units.splice(Math.floor(units.length/2), 0, `<div class="pause wrap"><p>${s.pause}</p></div>`);
+  return units.join('');
+}
 $('#roomsWrap').innerHTML = SERIES.map((s,i)=>{ const nx = SERIES[i+1];
   return `<section class="room" id="room-${s.id}" aria-label="${s.title}">
     <div class="room-open wrap"><span class="small">Room ${s.no}</span><h2>${s.title}<em>${s.en}</em></h2><blockquote>${s.epigraph}</blockquote></div>
-    ${byId(s.id).map(pieceHTML).join('')}
+    ${roomUnits(s)}
     <div class="room-exit wrap">${nx ? `<a href="#room-${nx.id}"><span class="small">Next room</span><b>${nx.title}</b></a>` : `<a href="#works"><span class="small">Exit</span><b>모든 작품 보기</b></a>`}</div>
   </section>`; }).join('');
 hydrate($('#roomsWrap'));
@@ -393,12 +440,12 @@ function renderCatalogue(){
   if (!list.length){ el.className='grid'; el.innerHTML = `<div class="empty">아직 걸린 작품이 없어요.</div>`; return; }
   if (curView==='list'){
     el.className = 'list';
-    el.innerHTML = list.map(w=>`<div class="l-row" role="button" tabindex="0" data-no="${w.no}" data-set="cat" aria-label="${w.title} 크게 보기"><span class="no">${no(w)}</span><div class="th"><img src="${w.src}" alt="" loading="lazy"></div><b>${w.title}</b><span class="s">「${w.sym}」</span><span class="v">${w.line}</span></div>`).join('');
+    el.innerHTML = list.map(w=>`<div class="l-row" role="button" tabindex="0" data-no="${w.no}" data-set="cat" aria-label="${w.title} 크게 보기"><span class="no">${no(w)}</span><div class="th"><img src="${small(w)}" alt="" loading="lazy"></div><b>${w.title}</b><span class="s">「${w.sym}」</span><span class="v">${w.line}</span></div>`).join('');
   } else {
     el.className = 'grid';
     let nP = 0, nL = 0;
     const slot = w => w.r < .9 ? ['g-b','g-d'][nP++ % 2] : w.r > 1.6 ? 'g-c' : ['g-a','g-e'][nL++ % 2];  /* portrait → narrow, landscape → wide */
-    el.innerHTML = list.map(w=>`<figure class="g-item ${slot(w)}" style="--r:${w.r}" data-no="${w.no}" data-set="cat" tabindex="0" role="button" aria-label="${w.title} 크게 보기"><div class="frame"><img src="${w.src}" alt="${w.alt}" loading="lazy"></div><figcaption><span class="no">${no(w)}</span><b>${w.title}</b><span class="s">「${w.sym}」</span></figcaption></figure>`).join('');
+    el.innerHTML = list.map(w=>`<figure class="g-item ${slot(w)}" style="--r:${w.r}" data-no="${w.no}" data-set="cat" tabindex="0" role="button" aria-label="${w.title} 크게 보기"><div class="frame"><img ${img(w,'(max-width:900px) 92vw, 50vw')} alt="${w.alt}" loading="lazy"></div><figcaption><span class="no">${no(w)}</span><b>${w.title}</b><span class="s">「${w.sym}」</span></figcaption></figure>`).join('');
   }
   hydrate(el);
 }
@@ -416,13 +463,13 @@ renderCatalogue();
 /* ---- Viewing room ---- */
 const lb = $('#lb'); let lbSet = [], lbI = 0, lastFocus = null;
 function showLB(){ const w = lbSet[lbI], s = seriesOf(w);
-  $('#lbImg').src = w.src; $('#lbImg').alt = w.alt; $('#lbSym').textContent = `「${w.sym}」`; $('#lbVerse').textContent = w.line;
+  $('#lbImg').src = full(w); $('#lbImg').alt = w.alt; $('#lbSym').textContent = `「${w.sym}」`; $('#lbVerse').textContent = w.line;
   $('#lbNo').textContent = no(w); $('#lbTitle').textContent = w.title; $('#lbPlace').textContent = metaLine(w); $('#lbSeries').textContent = `Room ${s.no} · ${s.title}`;
   $('#lbNote').textContent = w.note || ''; $('#lbNote').hidden = !w.note; $('#lbCount').textContent = `${pad(lbI+1)} / ${pad(lbSet.length)}`;
   $('#lbThumbs').querySelectorAll('button').forEach((b,i)=>{ b.setAttribute('aria-current', i===lbI); if(i===lbI) b.scrollIntoView({block:'nearest',inline:'nearest'}); });
-  [lbSet[(lbI+1)%lbSet.length], lbSet[(lbI-1+lbSet.length)%lbSet.length]].forEach(n=>{ const im = new Image(); im.src = n.src; }); }
+  [lbSet[(lbI+1)%lbSet.length], lbSet[(lbI-1+lbSet.length)%lbSet.length]].forEach(n=>{ const im = new Image(); im.src = full(n); }); }
 function openLB(set, n){ lbSet = set; lbI = Math.max(0, set.findIndex(w=>w.no===n)); lastFocus = document.activeElement;
-  $('#lbThumbs').innerHTML = set.map((w,i)=>`<button type="button" data-i="${i}" aria-label="${no(w)} ${w.title}"><img src="${w.src}" alt=""></button>`).join('');
+  $('#lbThumbs').innerHTML = set.map((w,i)=>`<button type="button" data-i="${i}" aria-label="${no(w)} ${w.title}"><img src="${small(w)}" alt="" loading="lazy"></button>`).join('');
   showLB(); lb.hidden = false; if(window.lenis) lenis.stop(); $('#lbClose').focus();
   if(hasGSAP && !reduce) gsap.fromTo('#lbImg',{opacity:0,filter:'blur(8px)'},{opacity:1,filter:'blur(0px)',duration:1.4,ease:'power2.out'}); }
 function closeLB(){ lb.hidden = true; if(window.lenis) lenis.start(); lastFocus && lastFocus.focus(); }
@@ -508,14 +555,14 @@ if (hasGSAP && !reduce){
     tl.from(loader.querySelectorAll('h2 span'),{opacity:0,filter:'blur(10px)',duration:1,stagger:.12,ease:'power2.out'})
       .to(q('.hz'),{opacity:0,filter:'blur(10px)',duration:.7,ease:'power2.in'},'+=.3');
   } else {
-    tl.to(q('.horizon'),{scaleX:1,duration:2.8,ease:'power3.inOut'})
-      .from(loader.querySelectorAll('h2 span'),{y:20,opacity:0,filter:'blur(14px)',duration:2.2,stagger:.35,ease:'power2.out'},'-=1.6')
-      .from(q('.q'),{opacity:0,filter:'blur(8px)',duration:1.8,ease:'power2.out'},'-=1')
-      .to([q('.hz'),q('.q')],{opacity:0,filter:'blur(10px)',duration:1.1,ease:'power2.in'},'+=1.2');
+    tl.to(q('.horizon'),{scaleX:1,duration:1.9,ease:'power3.inOut'})
+      .from(loader.querySelectorAll('h2 span'),{y:16,opacity:0,filter:'blur(12px)',duration:1.5,stagger:.22,ease:'power2.out'},'-=1.2')
+      .from(q('.q'),{opacity:0,filter:'blur(8px)',duration:1.2,ease:'power2.out'},'-=.8')
+      .to([q('.hz'),q('.q')],{opacity:0,filter:'blur(10px)',duration:.8,ease:'power2.in'},'+=.7');
   }
   tl.to(q('.horizon'),{boxShadow:'0 0 40px rgba(147,188,230,.8)',duration:.6,ease:'power2.out'},'-=.3')
-    .to(q('.lid.top'),{yPercent:-100,duration:2.6,ease:'expo.inOut'},'-=.1')
-    .to(q('.lid.bot'),{yPercent:100,duration:2.6,ease:'expo.inOut'},'<')
+    .to(q('.lid.top'),{yPercent:-100,duration:2.1,ease:'expo.inOut'},'-=.1')
+    .to(q('.lid.bot'),{yPercent:100,duration:2.1,ease:'expo.inOut'},'<')
     .to(q('.horizon'),{opacity:0,duration:1.4,ease:'power2.out'},'<.4')
     .from('.hero .ph img',{scale:1.2,duration:3.8,ease:'expo.out'},'<-.4')
     .from('.hero .ph',{filter:'blur(14px)',duration:3,ease:'power2.out',clearProps:'filter'},'<')
@@ -539,10 +586,11 @@ if (hasGSAP && !reduce){
     gsap.fromTo(el.children,{opacity:0,filter:'blur(10px)'},{opacity:1,filter:'blur(0px)',stagger:.25,ease:'none',scrollTrigger:{trigger:el,start:'top 75%',end:'center center',scrub:1}});
   });
   document.querySelectorAll('.piece').forEach(el=>{
-    const frame = el.querySelector('.frame'), cap = el.querySelector('.caption');
-    gsap.fromTo(frame,{opacity:0,scale:.97,filter:'blur(12px)'},{opacity:1,scale:1,filter:'blur(0px)',ease:'none',scrollTrigger:{trigger:el,start:'top 85%',end:'center 60%',scrub:1}});
-    gsap.fromTo(cap,{opacity:0,y:16},{opacity:1,y:0,ease:'none',scrollTrigger:{trigger:el,start:'top 50%',end:'center 50%',scrub:1}});
+    const frames = el.querySelectorAll('.frame'), caps = el.querySelectorAll('.caption');
+    gsap.fromTo(frames,{opacity:0,scale:.97,filter:'blur(12px)'},{opacity:1,scale:1,filter:'blur(0px)',stagger:.15,ease:'none',scrollTrigger:{trigger:el,start:'top 85%',end:'center 60%',scrub:1}});
+    gsap.fromTo(caps,{opacity:0,y:16},{opacity:1,y:0,stagger:.15,ease:'none',scrollTrigger:{trigger:el,start:'top 50%',end:'center 50%',scrub:1}});
   });
+  document.querySelectorAll('.pause p').forEach(p=>gsap.fromTo(p,{opacity:0,filter:'blur(10px)'},{opacity:1,filter:'blur(0px)',ease:'none',scrollTrigger:{trigger:p,start:'top 85%',end:'center 55%',scrub:1}}));
   document.querySelectorAll('.room-exit a').forEach(a=>gsap.from(a,{opacity:0,duration:1.6,ease:'power2.out',scrollTrigger:{trigger:a,start:'top 88%',once:true}}));
 
   /* Catalogue works appear softly */
