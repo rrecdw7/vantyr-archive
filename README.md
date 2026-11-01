@@ -17,7 +17,7 @@ vantyr-archive/
 2. `index.html`에서 `const WORKS = [` 를 찾아, 맨 아래에 한 줄을 추가해요.
 
 ```js
-{no:19, series:'night', src:'photos/rainyday.jpg', r:.75, title:'비 오는 밤', place:'동네 길', date:'2026.11.02', season:'가을', note:'우산 없이 걷던 밤', alt:'비에 젖은 밤길과 가로등'},
+{no:19, series:'night', src:'photos/rainyday.jpg', r:.75, title:'비 오는 밤', place:'동네 길', date:'2026.11.02', sym:'젖음', line:'비가 오면 길은 하늘을 한 번 더 비춘다.', note:'우산 없이 걷던 밤', alt:'비에 젖은 밤길과 가로등'},
 ```
 
 | 항목 | 뜻 |
@@ -27,22 +27,24 @@ vantyr-archive/
 | `src` | 사진 경로 |
 | `r` | 사진 비율 = 가로 ÷ 세로 (정사각형 1, 세로 3:4 → .75, 가로 4:3 → 1.333) |
 | `title` · `place` | 작품 제목 · 장소 |
-| `date` | `2026.11.02` 형식. 모르면 `''` → 'Undated'로 표시 |
+| `date` | `2026.11.02` 형식. 모르면 `''` (표시 안 됨) |
+| `sym` | 사진이 상징하는 단어 하나 → 「」 안에 표시 |
+| `line` | 사진 아래 걸리는 한 문장 |
 | `note` | 한 줄 기록. 없으면 `''` |
 | `alt` | 사진 설명 (화면 낭독기, 검색용) |
 | `featured:true` | 첫 화면 대표 작품으로 걸고 싶을 때만 (하나만) |
 
-작품 수, 오프닝 장면, 전시실, 전체 작품 목록, 장소 텍스트 띠는 **자동으로** 바뀌어요.
+전시실 목록, 각 전시실, 모든 작품 목록, 작품 보기 화면은 **자동으로** 바뀌어요.
 
 ## 전시실 추가하기
 
 `const SERIES = [` 에 한 줄 추가:
 
 ```js
-{id:'sky', no:'05', title:'하늘', en:['Open','Sky'], desc:'고개를 들면 보이던 것들.'},
+{id:'sky', no:'V', title:'하늘', en:'Open Sky', epigraph:'고개를 들면 보이던 것들.'},
 ```
 
-`en`은 큰 영어 제목의 두 줄(두 번째 줄은 기울임체). 그리고 `NEXT_ROOM`의 번호를 하나 올려요.
+`epigraph`는 전시실을 여는 문장이에요. 그리고 `NEXT_ROOM`의 번호를 하나 올려요(V → VI).
 
 ## 배경음악 바꾸기
 
@@ -62,5 +64,5 @@ vantyr-archive/
 ## 쓰는 기술
 
 GSAP 3.12.5 + ScrollTrigger (애니메이션), Lenis 1.1.13 (부드러운 스크롤),
-Google Fonts — Cormorant Garamond, Noto Serif KR, Noto Sans KR, Share Tech Mono.
+Google Fonts — Cormorant Garamond, Noto Serif KR.
 빌드 과정 없는 HTML 한 장이라, 파일만 바꾸면 바로 반영돼요.
