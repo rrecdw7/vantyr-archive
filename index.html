@@ -75,12 +75,14 @@ main,footer,.hero{position:relative;z-index:1}
 .loader .lid.top{top:0}
 .loader .lid.bot{bottom:0}
 .loader .horizon{position:absolute;left:0;right:0;top:50%;height:1px;margin-top:-.5px;background:linear-gradient(90deg,transparent,var(--sky) 20%,var(--ink) 50%,var(--sky) 80%,transparent);box-shadow:0 0 18px var(--glow);transform:scaleX(0)}
-.loader .hz{position:absolute;left:16px;right:16px;bottom:calc(50% + 28px);display:grid;justify-items:center;gap:14px;text-align:center}
+.loader{--sm:clamp(150px,14vw,220px)}
+.loader .sun{position:absolute;left:50%;top:50%;width:var(--sm);height:var(--sm);margin:calc(var(--sm) / -2) 0 0 calc(var(--sm) / -2);overflow:visible;filter:drop-shadow(0 0 22px rgba(232,228,220,.18))}
+.loader .hz{position:absolute;left:16px;right:16px;bottom:calc(50% + var(--sm) * .19 + 34px);display:grid;justify-items:center;gap:14px;text-align:center}
 .loader h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:clamp(36px,5.2vw,68px);line-height:1;letter-spacing:.01em;display:flex;flex-wrap:wrap;justify-content:center}
 .loader h2 span{display:inline-block;white-space:pre}
 .loader .q{position:absolute;left:16px;right:16px;bottom:calc(50% + 30px);margin:0 auto;max-width:30ch;text-align:center;color:var(--ink);font-weight:300;font-size:clamp(20px,2.3vw,30px);line-height:1.7;text-wrap:balance}
 .loader .q .w{display:inline-block;white-space:pre}
-.loader .meta{position:absolute;left:16px;right:16px;top:calc(50% + 30px);margin:0;text-align:center;font-family:var(--f-display);font-size:clamp(13px,1.1vw,15px);letter-spacing:.28em;text-transform:uppercase;color:var(--ink-soft);opacity:0}
+.loader .meta{position:absolute;left:16px;right:16px;top:calc(50% + var(--sm) * .19 + 22px);margin:0;text-align:center;font-family:var(--f-display);font-size:clamp(13px,1.1vw,15px);letter-spacing:.28em;text-transform:uppercase;color:var(--ink-soft);opacity:0}
 .loader .meta i{font-style:normal;opacity:.45;margin:0 .9em}
 @media (max-width:560px){.loader .meta{letter-spacing:.14em;font-size:12px;white-space:nowrap}.loader .meta i{margin:0 .45em}}
 @media (max-width:560px){html[lang="en"] .loader .meta{letter-spacing:.07em;font-size:11.5px}html[lang="en"] .loader .meta i{margin:0 .35em}}
@@ -668,6 +670,9 @@ if (hasGSAP && !reduce){
   const loader = document.createElement('div'); loader.className='loader';
   loader.innerHTML = `<div class="reel"><img src="${featured.hd ? base(featured)+'-2400.webp' : featured.src}" alt="" decoding="async"></div>
     <div class="lid top"></div><div class="lid bot"></div><div class="horizon"></div>
+    <svg class="sun" viewBox="0 0 200 200" aria-hidden="true"><defs><clipPath id="skyclip"><rect x="-200" y="-200" width="600" height="300"/></clipPath></defs>
+      <g clip-path="url(#skyclip)"><circle class="orb" cx="100" cy="100" r="38" fill="#E8E4DC"/></g>
+      <rect class="rf" x="72" y="111" width="56" height="3.2" rx="1.6" fill="#E8E4DC" fill-opacity=".6"/><rect class="rf" x="83" y="122" width="34" height="2.8" rx="1.4" fill="#E8E4DC" fill-opacity=".4"/><rect class="rf" x="92.5" y="132" width="15" height="2.5" rx="1.25" fill="#E8E4DC" fill-opacity=".24"/></svg>
     <div class="hz"><h2 aria-label="Vantyr Archive"><span aria-hidden="true">Vantyr&nbsp;</span><span aria-hidden="true"><em>Archive</em></span></h2></div>
     <p class="q">${(()=>{ const words = t => t.split(' ').map((w,i,a)=>`<span class="w">${w}${i<a.length-1?' ':''}</span>`).join(''); return bi(words(featured.line), E(featured).line && words(E(featured).line)); })()}</p>
     <button class="lng small" type="button" aria-label="언어 바꾸기 / Change language"><span data-l="ko">KO</span><i>/</i><span data-l="en">EN</span></button>
@@ -689,14 +694,22 @@ if (hasGSAP && !reduce){
              gsap.to(q('.enter span'),{opacity:.5,duration:1.8,ease:'sine.inOut',yoyo:true,repeat:-1,delay:1.4})];
     breath = gsap.to(q('.horizon'),{boxShadow:'0 0 34px rgba(147,188,230,.75)',opacity:.75,duration:2.6,ease:'sine.inOut',yoyo:true,repeat:-1});
   }
+  /* the logo, in motion: a sun rises out of the horizon and its light spreads on the water */
+  const orb = q('.orb'), rf = loader.querySelectorAll('.rf');
+  gsap.set(orb,{y:80}); gsap.set(rf,{scaleX:0,opacity:0,transformOrigin:'50% 50%'});
   if (seen){
     gsap.set(q('.horizon'),{scaleX:1});
-    tl.from(loader.querySelectorAll('h2 span'),{opacity:0,filter:'blur(10px)',duration:1,stagger:.12,ease:'power2.out'})
+    tl.to(orb,{y:0,duration:1.4,ease:'power2.out'})
+      .to(rf,{scaleX:1,opacity:1,duration:.8,stagger:.12,ease:'power2.out'},'-=.8')
+      .from(loader.querySelectorAll('h2 span'),{opacity:0,filter:'blur(10px)',duration:1,stagger:.12,ease:'power2.out'},'-=.7')
       .to(q('.meta'),{opacity:1,duration:1,ease:'power2.out'},'-=.5')
       .add(gate,'+=.3');
   } else {
     tl.to(q('.horizon'),{scaleX:1,duration:1.9,ease:'power3.inOut'})
-      .from(loader.querySelectorAll('h2 span'),{y:16,opacity:0,filter:'blur(12px)',duration:1.5,stagger:.22,ease:'power2.out'},'-=1.2')
+      .to(orb,{y:0,duration:2.2,ease:'power2.out'},'-=.5')
+      .to(q('.horizon'),{boxShadow:'0 0 30px rgba(147,188,230,.6)',duration:1.4,ease:'sine.out'},'<.2')
+      .to(rf,{scaleX:1,opacity:1,duration:1.1,stagger:.2,ease:'power2.out'},'-=1.3')
+      .from(loader.querySelectorAll('h2 span'),{y:16,opacity:0,filter:'blur(12px)',duration:1.5,stagger:.22,ease:'power2.out'},'-=.9')
       .to(q('.meta'),{opacity:1,duration:1.2,ease:'power2.out'},'-=.6')
       .add(gate,'+=.4');
   }
@@ -706,7 +719,10 @@ if (hasGSAP && !reduce){
   gsap.set(words,{opacity:0,y:10,filter:'blur(10px)'});
   tl.add(()=>{ breath && breath.kill(); pulse.forEach(t=>t.kill()); })
     .to([q('.hz'),q('.meta'),q('.enter'),q('.lng')],{opacity:0,filter:'blur(10px)',duration:.8,ease:'power2.in'},'+=.2')
-    .to(q('.horizon'),{opacity:.45,boxShadow:'0 0 12px rgba(147,188,230,.4)',duration:.8,ease:'power2.out'},'<')
+    .to(rf,{scaleX:0,opacity:0,duration:.7,stagger:{each:.1,from:'end'},ease:'power2.in'},'<')
+    .to(orb,{y:80,duration:2.6,ease:'sine.inOut'},'<.3')
+    .to(q('.horizon'),{opacity:1,boxShadow:'0 0 40px rgba(147,188,230,.85)',duration:.8,ease:'power2.out'},'<1.5')
+    .to(q('.horizon'),{opacity:.45,boxShadow:'0 0 12px rgba(147,188,230,.4)',duration:1.1,ease:'power2.inOut'})
     .to(words,{opacity:1,y:0,filter:'blur(0px)',duration:1.5,stagger:.22,ease:'power2.out'},'-=.1')
     .to(q('.q'),{opacity:0,filter:'blur(10px)',duration:1,ease:'power2.in'},'+=1.6')
     .to(q('.horizon'),{opacity:1,boxShadow:'0 0 44px rgba(147,188,230,.85)',duration:.6,ease:'power2.out'},'-=.4')
