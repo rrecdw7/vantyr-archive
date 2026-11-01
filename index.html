@@ -166,6 +166,11 @@ a.ri-row:hover .t{transform:translateX(10px)}
 .verse{margin:0;font-weight:300;font-size:clamp(19px,1.9vw,24px);line-height:1.65;text-wrap:balance}
 .meta{font-size:13px;color:var(--ink-soft);margin-top:4px}
 .meta .no{margin-right:10px}
+/* the artist's own words, signed */
+.anote{margin:14px 0 0;max-width:36ch;font-size:14.5px;line-height:1.9;color:var(--ink-soft);text-wrap:pretty}
+.anote::before{content:"";display:block;width:24px;height:1px;margin:0 auto 16px;background:currentColor;opacity:.35}
+.half .anote{font-size:13.5px}
+.sig{display:block;margin-top:8px;font-family:var(--f-display);font-style:italic;font-size:18px;letter-spacing:.02em;color:var(--ink)}
 .room-exit{display:grid;justify-items:center;padding-block:40px 160px}
 .room-exit a{text-decoration:none;display:grid;justify-items:center;gap:10px;color:var(--ink-soft);transition:color .5s}
 .room-exit a:hover{color:var(--ink)}
@@ -430,7 +435,7 @@ $('#riList').innerHTML = SERIES.map(s=>`<li><a class="ri-row" href="#room-${s.id
   + `<li><div class="ri-row soon"><span class="no">${NEXT_ROOM.no}.</span><span class="t">다음 전시실</span><span class="m">${NEXT_ROOM.note}</span></div></li>`;
 
 /* ---- Rooms ---- */
-const captionHTML = w => `<figcaption class="caption"><span class="sym">「${w.sym}」</span><p class="verse">${w.line}</p><span class="meta"><span class="no">${no(w)}</span>${w.title}${metaLine(w) ? ' · ' + metaLine(w) : ''}</span></figcaption>`;
+const captionHTML = w => `<figcaption class="caption"><span class="sym">「${w.sym}」</span><p class="verse">${w.line}</p><span class="meta"><span class="no">${no(w)}</span>${w.title}${metaLine(w) ? ' · ' + metaLine(w) : ''}</span>${w.note ? `<p class="anote">${w.note}<span class="sig">— Vantyr</span></p>` : ''}</figcaption>`;
 const pieceHTML = w => { const big = LARGE.includes(w.no);
   return `<figure class="piece${big ? ' large' : ''}" data-no="${w.no}" data-set="${w.series}">
   <div class="frame" style="--r:${w.r}" data-view><img ${img(w, big ? '(max-width:900px) 92vw, 80vw' : '(max-width:900px) 92vw, 60vw')} alt="${w.alt}" loading="lazy"></div>
@@ -490,7 +495,7 @@ const lb = $('#lb'); let lbSet = [], lbI = 0, lastFocus = null;
 function showLB(){ const w = lbSet[lbI], s = seriesOf(w);
   $('#lbImg').src = full(w); $('#lbImg').alt = w.alt; $('#lbSym').textContent = `「${w.sym}」`; $('#lbVerse').textContent = w.line;
   $('#lbNo').textContent = no(w); $('#lbTitle').textContent = w.title; $('#lbPlace').textContent = metaLine(w); $('#lbSeries').textContent = `Room ${s.no} · ${s.title}`;
-  $('#lbNote').textContent = w.note || ''; $('#lbNote').hidden = !w.note; $('#lbCount').textContent = `${pad(lbI+1)} / ${pad(lbSet.length)}`;
+  const nt = $('#lbNote'); nt.textContent = w.note || ''; if (w.note) nt.append(Object.assign(document.createElement('span'),{className:'sig',textContent:'— Vantyr'})); nt.hidden = !w.note; $('#lbCount').textContent = `${pad(lbI+1)} / ${pad(lbSet.length)}`;
   $('#lbThumbs').querySelectorAll('button').forEach((b,i)=>{ b.setAttribute('aria-current', i===lbI); if(i===lbI) b.scrollIntoView({block:'nearest',inline:'nearest'}); });
   [lbSet[(lbI+1)%lbSet.length], lbSet[(lbI-1+lbSet.length)%lbSet.length]].forEach(n=>{ const im = new Image(); im.src = full(n); }); }
 function openLB(set, n){ lbSet = set; lbI = Math.max(0, set.findIndex(w=>w.no===n)); lastFocus = document.activeElement;
