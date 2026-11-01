@@ -95,3 +95,11 @@ Google Fonts — Cormorant Garamond, Noto Serif KR.
 소리 없이 반복 재생되는 짧은 영상도 작품으로 걸 수 있어요.
 - `videos/이름.mp4` (큰 화면용)와 `videos/이름-720.mp4` (휴대폰용)를 넣어요. 소리는 빼고 넣어요.
 - 포스터(첫 장면) 사진을 `photos/이름.jpg`로 넣고, 작품 줄에 `video:'videos/이름'`을 추가해요.
+
+## 로고
+
+`brand/` 폴더에 있어요.
+- `mark.svg` / `mark.png` — 해질녘 심볼 (어두운 배경용), `mark-dark-on-light.svg` — 밝은 배경용
+- `lockup.svg` / `lockup.png` — 심볼 + Vantyr Archive (어두운 배경용), `lockup-dark-on-light.*` — 밝은 배경용
+- `icon-512.png` — 프로필 사진 등 정사각형 아이콘
+사이트 탭 아이콘은 `favicon.svg`, `favicon-32.png`, 휴대폰 홈 화면 아이콘은 `apple-touch-icon.png`예요.
