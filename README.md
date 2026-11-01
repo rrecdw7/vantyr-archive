@@ -89,3 +89,9 @@ Google Fonts — Cormorant Garamond, Noto Serif KR.
 ```js
 29:['Title','Place','Symbol','One line.','Note (작가 기록 번역, 없으면 빈칸)'],
 ```
+
+## 영상 작품 (움직이는 사진)
+
+소리 없이 반복 재생되는 짧은 영상도 작품으로 걸 수 있어요.
+- `videos/이름.mp4` (큰 화면용)와 `videos/이름-720.mp4` (휴대폰용)를 넣어요. 소리는 빼고 넣어요.
+- 포스터(첫 장면) 사진을 `photos/이름.jpg`로 넣고, 작품 줄에 `video:'videos/이름'`을 추가해요.
