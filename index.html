@@ -76,6 +76,8 @@ main,footer,.hero{position:relative;z-index:1}
 .loader h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:clamp(36px,5.2vw,68px);line-height:1;letter-spacing:.01em;display:flex;flex-wrap:wrap;justify-content:center}
 .loader h2 span{display:inline-block;white-space:pre}
 .loader .q{position:absolute;left:16px;right:16px;top:calc(50% + 26px);margin:0;text-align:center;color:var(--ink-soft);font-size:15px}
+.loader .enter{position:absolute;left:0;right:0;bottom:calc(64px + env(safe-area-inset-bottom,0px));margin:0;text-align:center;opacity:0;cursor:pointer}
+.loader.gate{cursor:pointer}
 
 /* ---------- Navigation ---------- */
 .mini{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:space-between;align-items:center;gap:20px;padding-top:calc(16px + env(safe-area-inset-top,0px));padding-bottom:16px;background:rgba(13,16,23,.8);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);transform:translateY(-101%);transition:transform .9s var(--ease)}
@@ -518,7 +520,9 @@ addEventListener('scroll', ()=>{ let cur = null; secs.forEach(s=>{ if (s.getBoun
     btns.forEach(b=>{ b.setAttribute('aria-pressed', on); b.setAttribute('aria-label', on ? '배경음악 끄기' : '배경음악 켜기'); });
   }
   btns.forEach(b=>b.addEventListener('click', ()=>{ touched = true; off(); setSound(!on); }));
-  audio.play().then(()=>{ if(!touched){ touched = true; off(); setSound(true); } }).catch(()=>{});
+  /* 들어오는 순간 재생을 시도해요. 브라우저가 막으면 오프닝 끝에서 한 번의 클릭으로 시작돼요 */
+  window.autoplay = 'pending';
+  audio.play().then(()=>{ window.autoplay = 'ok'; if(!touched){ touched = true; off(); setSound(true); } }).catch(()=>{ window.autoplay = 'blocked'; });
   const first = e => { if (touched || (e.target.closest && e.target.closest('.snd'))) return; touched = true; off(); setSound(true); };
   const off = () => ['pointerdown','keydown','touchstart'].forEach(t=>removeEventListener(t,first,true));
   ['pointerdown','keydown','touchstart'].forEach(t=>addEventListener(t,first,true));
@@ -544,21 +548,32 @@ if (hasGSAP && !reduce){
   const loader = document.createElement('div'); loader.className='loader';
   loader.innerHTML = `<div class="lid top"></div><div class="lid bot"></div><div class="horizon"></div>
     <div class="hz"><h2 aria-label="Vantyr Archive"><span aria-hidden="true">Vantyr&nbsp;</span><span aria-hidden="true"><em>Archive</em></span></h2></div>
-    <p class="q">${featured.line}</p>`;
+    <p class="q">${featured.line}</p>
+    <p class="enter small">Click to enter</p>`;
   document.body.appendChild(loader);
   if (window.lenis) lenis.stop();
   const q = s => loader.querySelector(s);
   let seen = false; try { seen = localStorage.getItem('va-seen') === '1'; localStorage.setItem('va-seen','1'); } catch(e){}
   const tl = gsap.timeline();
+  let waiting = false;
+  function gate(){
+    const playing = document.querySelector('.snd[aria-pressed="true"]');
+    if (window.autoplay === 'ok' || playing) return;            // music already on: keep going
+    waiting = true; tl.pause(); loader.classList.add('gate');
+    gsap.to(q('.enter'),{opacity:1,duration:1.2,ease:'power2.out'});
+    gsap.to(q('.enter'),{opacity:.45,duration:1.6,ease:'sine.inOut',yoyo:true,repeat:-1,delay:1.2});
+  }
   if (seen){
     gsap.set(q('.horizon'),{scaleX:1}); gsap.set(q('.q'),{display:'none'});
     tl.from(loader.querySelectorAll('h2 span'),{opacity:0,filter:'blur(10px)',duration:1,stagger:.12,ease:'power2.out'})
-      .to(q('.hz'),{opacity:0,filter:'blur(10px)',duration:.7,ease:'power2.in'},'+=.3');
+      .add(gate,'+=.2')
+      .to(q('.hz'),{opacity:0,filter:'blur(10px)',duration:.7,ease:'power2.in'},'+=.1');
   } else {
     tl.to(q('.horizon'),{scaleX:1,duration:1.9,ease:'power3.inOut'})
       .from(loader.querySelectorAll('h2 span'),{y:16,opacity:0,filter:'blur(12px)',duration:1.5,stagger:.22,ease:'power2.out'},'-=1.2')
       .from(q('.q'),{opacity:0,filter:'blur(8px)',duration:1.2,ease:'power2.out'},'-=.8')
-      .to([q('.hz'),q('.q')],{opacity:0,filter:'blur(10px)',duration:.8,ease:'power2.in'},'+=.7');
+      .add(gate,'+=.5')
+      .to([q('.hz'),q('.q')],{opacity:0,filter:'blur(10px)',duration:.8,ease:'power2.in'},'+=.2');
   }
   tl.to(q('.horizon'),{boxShadow:'0 0 40px rgba(147,188,230,.8)',duration:.6,ease:'power2.out'},'-=.3')
     .to(q('.lid.top'),{yPercent:-100,duration:2.1,ease:'expo.inOut'},'-=.1')
@@ -570,7 +585,11 @@ if (hasGSAP && !reduce){
     .from('.hero-text .line > span',{yPercent:30,opacity:0,filter:'blur(16px)',duration:2.6,stagger:.3,ease:'power2.out'},'-=2.2')
     .from('.nav, .hero-foot',{opacity:0,duration:1.6,ease:'power2.out'},'-=1.6')
     .add(()=>{ loader.remove(); safeRefresh(); });
-  loader.addEventListener('click',()=>tl.timeScale(4));
+  loader.addEventListener('click',()=>{
+    if (waiting){ waiting = false; loader.classList.remove('gate'); gsap.killTweensOf(q('.enter')); gsap.to(q('.enter'),{opacity:0,duration:.5}); tl.play(); }
+    else if (!tl.paused()) tl.timeScale(3);
+  });
+  addEventListener('keydown',e=>{ if (waiting && (e.key==='Enter' || e.key===' ')){ e.preventDefault(); loader.click(); } });
 
   gsap.to('[data-parallax]',{yPercent:10,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:true}});
 
