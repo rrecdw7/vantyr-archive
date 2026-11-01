@@ -23,7 +23,7 @@ vantyr-archive/
 | 항목 | 뜻 |
 |---|---|
 | `no` | 작품 번호. 마지막 번호 + 1 |
-| `series` | 걸 전시실의 id (`sea`, `transit`, `night`, `lines` …) |
+| `series` | 걸 전시실의 id (`sea`, `transit`, `night`, `lines`, `weather`, `dusk` …) |
 | `src` | 사진 경로 |
 | `r` | 사진 비율 = 가로 ÷ 세로 (정사각형 1, 세로 3:4 → .75, 가로 4:3 → 1.333) |
 | `title` · `place` | 작품 제목 · 장소 |
@@ -42,8 +42,8 @@ vantyr-archive/
 `index.html`의 `PAIRS`와 `LARGE`로 조절해요.
 
 ```js
-const PAIRS = [[5,9],[2,3],[15,18]];  // 서로 닮은 두 작품을 한 화면에 나란히
-const LARGE = [7,1,13];               // 화면 가득 크게 거는 작품
+const PAIRS = [[5,9],[2,3],[15,18],[23,24]];  // 서로 닮은 두 작품을 한 화면에 나란히
+const LARGE = [7,1,13,28,26];               // 화면 가득 크게 거는 작품
 ```
 
 전시실에 `pause:'문장'`을 넣으면 작품이 4점 이상일 때 가운데쯤 문장만 있는 쉼표 화면이 생겨요.
@@ -55,10 +55,10 @@ const LARGE = [7,1,13];               // 화면 가득 크게 거는 작품
 `const SERIES = [` 에 한 줄 추가:
 
 ```js
-{id:'sky', no:'V', title:'하늘', en:'Open Sky', epigraph:'고개를 들면 보이던 것들.'},
+{id:'sky', no:'VII', title:'하늘', en:'Open Sky', epigraph:'고개를 들면 보이던 것들.'},
 ```
 
-`epigraph`는 전시실을 여는 문장이에요. 그리고 `NEXT_ROOM`의 번호를 하나 올려요(V → VI).
+`epigraph`는 전시실을 여는 문장이에요. 그리고 `NEXT_ROOM`의 번호를 하나 올려요(VII → VIII).
 
 ## 배경음악 바꾸기
 
