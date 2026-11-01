@@ -531,15 +531,16 @@ const secs = ['about','rooms','works'].map(id=>document.getElementById(id));
 addEventListener('scroll', ()=>{ let cur = null; secs.forEach(s=>{ if (s.getBoundingClientRect().top < innerHeight*.45) cur = s.id; });
   mini.querySelectorAll('ul a').forEach(a=>a.classList.toggle('cur', a.getAttribute('href')==='#'+cur)); }, {passive:true});
 
-/* ---- Sound: Clair de lune, from the visitor's first click, tap or key ---- */
+/* ---- Sound: from the visitor's first click, tap or key ---- */
 (()=>{
   const btns = document.querySelectorAll('.snd'); let on = false, touched = false;
-  const MUSIC_SRC = 'music/clair-de-lune.mp3'; /* Debussy — Clair de lune */
+  const MUSIC_SRC = 'music/track.mp3';
+  const MUSIC_VOL = .26;   /* 이 곡은 음량이 큰 편이라 낮게 (0~1) */
   const audio = Object.assign(new Audio(MUSIC_SRC),{loop:true,volume:0,preload:'auto'});
   async function setSound(want, dur){
     on = want;
     try { if (on) await audio.play(); } catch(e){ on = false; }
-    if (hasGSAP) gsap.to(audio,{volume:on?.65:0,duration:on?(dur||3):1.6,ease:on?'sine.inOut':'power1.out',overwrite:true,onComplete:()=>{ if(!on) audio.pause(); }}); else { audio.volume = on?.65:0; if(!on) audio.pause(); }
+    if (hasGSAP) gsap.to(audio,{volume:on?MUSIC_VOL:0,duration:on?(dur||3):1.6,ease:on?'sine.inOut':'power1.out',overwrite:true,onComplete:()=>{ if(!on) audio.pause(); }}); else { audio.volume = on?MUSIC_VOL:0; if(!on) audio.pause(); }
     btns.forEach(b=>{ b.setAttribute('aria-pressed', on); b.setAttribute('aria-label', on ? '배경음악 끄기' : '배경음악 켜기'); });
   }
   btns.forEach(b=>b.addEventListener('click', ()=>{ touched = true; off(); setSound(!on); }));

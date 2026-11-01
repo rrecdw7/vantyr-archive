@@ -62,7 +62,7 @@ const LARGE = [7,1,13,28,26];               // 화면 가득 크게 거는 작�
 
 ## 배경음악 바꾸기
 
-`music/`에 파일을 넣고, `index.html`의 `const MUSIC_SRC = ...` 경로를 바꿔요.
+`music/`에 파일을 넣고, `index.html`의 `const MUSIC_SRC = ...` 경로를 바꿔요. 곡마다 음량이 다르면 `MUSIC_VOL`(0~1)로 맞춰요.
 공개 사이트에서는 **자유 이용 녹음**(퍼블릭 도메인, CC0, CC BY)만 쓰고, CC BY면 연주자를 표기해요.
 
 ---
