@@ -75,7 +75,8 @@ main,footer,.hero{position:relative;z-index:1}
 .loader .hz{position:absolute;left:16px;right:16px;bottom:calc(50% + 28px);display:grid;justify-items:center;gap:14px;text-align:center}
 .loader h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:clamp(36px,5.2vw,68px);line-height:1;letter-spacing:.01em;display:flex;flex-wrap:wrap;justify-content:center}
 .loader h2 span{display:inline-block;white-space:pre}
-.loader .q{position:absolute;left:16px;right:16px;top:calc(50% + 26px);margin:0;text-align:center;color:var(--ink-soft);font-size:15px}
+.loader .q{position:absolute;left:16px;right:16px;bottom:calc(50% + 30px);margin:0 auto;max-width:30ch;text-align:center;color:var(--ink);font-weight:300;font-size:clamp(20px,2.3vw,30px);line-height:1.7;text-wrap:balance}
+.loader .q span{display:inline-block;white-space:pre}
 .loader .meta{position:absolute;left:16px;right:16px;top:calc(50% + 30px);margin:0;text-align:center;font-family:var(--f-display);font-size:clamp(13px,1.1vw,15px);letter-spacing:.28em;text-transform:uppercase;color:var(--ink-soft);opacity:0}
 .loader .meta i{font-style:normal;opacity:.45;margin:0 .9em}
 @media (max-width:560px){.loader .meta{letter-spacing:.14em;font-size:12px;white-space:nowrap}.loader .meta i{margin:0 .45em}}
@@ -567,16 +568,14 @@ if (hasGSAP && !reduce){
   }
 
   /* Opening: a horizon is drawn, the name surfaces like an exhibition title card,
-     then the horizon opens into a film strip — a few works flicker past — and the featured work fills the screen */
+     one sentence on entering, then the horizon opens onto the featured work */
   const years = WORKS.map(w=>+(w.date||'').slice(0,4)).filter(Boolean);
   const since = years.length ? Math.min(...years) : new Date().getFullYear();
-  const reelPool = WORKS.filter(w=>w!==featured && w.hd && w.r>=.99).sort(()=>Math.random()-.5).slice(0,6);
-  const reelSrc = w => `${base(w)}-1200.webp`;
   const loader = document.createElement('div'); loader.className='loader';
-  loader.innerHTML = `<div class="reel">${[...reelPool,featured].map(w=>`<img src="${w===featured?base(w)+'-2400.webp':reelSrc(w)}" alt="" decoding="async">`).join('')}</div>
+  loader.innerHTML = `<div class="reel"><img src="${featured.hd ? base(featured)+'-2400.webp' : featured.src}" alt="" decoding="async"></div>
     <div class="lid top"></div><div class="lid bot"></div><div class="horizon"></div>
     <div class="hz"><h2 aria-label="Vantyr Archive"><span aria-hidden="true">Vantyr&nbsp;</span><span aria-hidden="true"><em>Archive</em></span></h2></div>
-    <p class="q">${featured.line}</p>
+    <p class="q" aria-label="${featured.line}">${featured.line.split(' ').map((w,i,a)=>`<span aria-hidden="true">${w}${i<a.length-1?' ':''}</span>`).join('')}</p>
     <p class="meta"><b>사진전</b><i>·</i>${WORKS.length} works<i>·</i>${SERIES.length} rooms<i>·</i>${since} —</p>
     <p class="enter" role="button" tabindex="0"><span>들어가기</span></p>`;
   document.body.appendChild(loader);
@@ -596,34 +595,32 @@ if (hasGSAP && !reduce){
     breath = gsap.to(q('.horizon'),{boxShadow:'0 0 34px rgba(147,188,230,.75)',opacity:.75,duration:2.6,ease:'sine.inOut',yoyo:true,repeat:-1});
   }
   if (seen){
-    gsap.set(q('.horizon'),{scaleX:1}); gsap.set(q('.q'),{display:'none'});
+    gsap.set(q('.horizon'),{scaleX:1});
     tl.from(loader.querySelectorAll('h2 span'),{opacity:0,filter:'blur(10px)',duration:1,stagger:.12,ease:'power2.out'})
       .to(q('.meta'),{opacity:1,duration:1,ease:'power2.out'},'-=.5')
       .add(gate,'+=.3');
   } else {
     tl.to(q('.horizon'),{scaleX:1,duration:1.9,ease:'power3.inOut'})
       .from(loader.querySelectorAll('h2 span'),{y:16,opacity:0,filter:'blur(12px)',duration:1.5,stagger:.22,ease:'power2.out'},'-=1.2')
-      .from(q('.q'),{opacity:0,filter:'blur(8px)',duration:1.2,ease:'power2.out'},'-=.8')
-      .to(q('.q'),{opacity:0,filter:'blur(8px)',duration:.9,ease:'power2.in'},'+=1.4')
-      .to(q('.meta'),{opacity:1,duration:1.2,ease:'power2.out'})
+      .to(q('.meta'),{opacity:1,duration:1.2,ease:'power2.out'},'-=.6')
       .add(gate,'+=.4');
   }
-  // through the horizon: lids part into a letterbox, a few works flicker past, then the featured work
+  // entering: the title card leaves, one sentence surfaces word by word,
+  // then the horizon opens — first into a narrow strip of the featured work, then the whole of it
+  const words = loader.querySelectorAll('.q span');
+  gsap.set(words,{opacity:0,y:10,filter:'blur(10px)'});
   tl.add(()=>{ breath && breath.kill(); pulse.forEach(t=>t.kill()); })
-    .to([q('.hz'),q('.meta'),q('.q'),q('.enter')],{opacity:0,filter:'blur(10px)',duration:.8,ease:'power2.in'},'+=.3')
-    .to(q('.horizon'),{boxShadow:'0 0 44px rgba(147,188,230,.85)',opacity:1,duration:.5,ease:'power2.out'},'-=.3')
+    .to([q('.hz'),q('.meta'),q('.enter')],{opacity:0,filter:'blur(10px)',duration:.8,ease:'power2.in'},'+=.2')
+    .to(q('.horizon'),{opacity:.45,boxShadow:'0 0 12px rgba(147,188,230,.4)',duration:.8,ease:'power2.out'},'<')
+    .to(words,{opacity:1,y:0,filter:'blur(0px)',duration:1.5,stagger:.22,ease:'power2.out'},'-=.1')
+    .to(q('.q'),{opacity:0,filter:'blur(10px)',duration:1,ease:'power2.in'},'+=1.6')
+    .to(q('.horizon'),{opacity:1,boxShadow:'0 0 44px rgba(147,188,230,.85)',duration:.6,ease:'power2.out'},'-=.4')
     .set(q('.reel'),{visibility:'visible'})
-    .to(q('.lid.top'),{y:-H/2,duration:1.05,ease:'expo.inOut'})
-    .to(q('.lid.bot'),{y:H/2,duration:1.05,ease:'expo.inOut'},'<')
-    .to(q('.horizon'),{opacity:0,duration:.5,ease:'power2.out'},'<.15');
-  const frames = loader.querySelectorAll('.reel img');
-  frames.forEach((im,i)=>{
-    const last = i === frames.length-1, at = i ? '>-.12' : '<.35';
-    tl.fromTo(im,{opacity:0,scale:1.08,filter:`blur(${Math.max(0,6-i*1.5)}px)`},
-                 {opacity:1,scale:1,filter:'blur(0px)',duration:last?1:.42,ease:last?'power2.out':'power1.out'},at);
-    if (!last) tl.to(im,{opacity:0,duration:.18,ease:'none'},'>-.05');
-  });
-  tl.to(q('.lid.top'),{yPercent:-100,duration:2.1,ease:'expo.inOut'},'+=.35')
+    .to(q('.lid.top'),{y:-H/2,duration:1.3,ease:'expo.inOut'})
+    .to(q('.lid.bot'),{y:H/2,duration:1.3,ease:'expo.inOut'},'<')
+    .to(q('.horizon'),{opacity:0,duration:.5,ease:'power2.out'},'<.15')
+    .fromTo(q('.reel img'),{opacity:0,scale:1.06,filter:'blur(8px)'},{opacity:1,scale:1,filter:'blur(0px)',duration:1.6,ease:'power2.out'},'<.2');
+  tl.to(q('.lid.top'),{yPercent:-100,duration:2.1,ease:'expo.inOut'},'-=.4')
     .to(q('.lid.bot'),{yPercent:100,duration:2.1,ease:'expo.inOut'},'<')
     .to(q('.reel'),{opacity:0,duration:1.1,ease:'power1.inOut'},'<.5')
     .from('.hero .ph img',{scale:1.12,duration:3.8,ease:'expo.out'},'<-.5')
