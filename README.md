@@ -1,0 +1,66 @@
+# Vantyr Archive
+
+Vantyr가 직접 찍은 사진을 시리즈별 전시실에 걸어 두는 온라인 사진 전시관.
+
+```
+vantyr-archive/
+├─ index.html      사이트 전체 (디자인 + 애니메이션 + 작품 목록)
+├─ photos/         작품 사진 (긴 변 1600px 안팎 JPG 권장)
+└─ music/          배경음악
+```
+
+---
+
+## 작품 추가하기
+
+1. 사진을 `photos/` 폴더에 넣어요. 파일 이름은 영어 소문자로 (예: `photos/rainyday.jpg`)
+2. `index.html`에서 `const WORKS = [` 를 찾아, 맨 아래에 한 줄을 추가해요.
+
+```js
+{no:19, series:'night', src:'photos/rainyday.jpg', r:.75, title:'비 오는 밤', place:'동네 길', date:'2026.11.02', season:'가을', note:'우산 없이 걷던 밤', alt:'비에 젖은 밤길과 가로등'},
+```
+
+| 항목 | 뜻 |
+|---|---|
+| `no` | 작품 번호. 마지막 번호 + 1 |
+| `series` | 걸 전시실의 id (`sea`, `transit`, `night`, `lines` …) |
+| `src` | 사진 경로 |
+| `r` | 사진 비율 = 가로 ÷ 세로 (정사각형 1, 세로 3:4 → .75, 가로 4:3 → 1.333) |
+| `title` · `place` | 작품 제목 · 장소 |
+| `date` | `2026.11.02` 형식. 모르면 `''` → 'Undated'로 표시 |
+| `note` | 한 줄 기록. 없으면 `''` |
+| `alt` | 사진 설명 (화면 낭독기, 검색용) |
+| `featured:true` | 첫 화면 대표 작품으로 걸고 싶을 때만 (하나만) |
+
+작품 수, 오프닝 장면, 전시실, 전체 작품 목록, 장소 텍스트 띠는 **자동으로** 바뀌어요.
+
+## 전시실 추가하기
+
+`const SERIES = [` 에 한 줄 추가:
+
+```js
+{id:'sky', no:'05', title:'하늘', en:['Open','Sky'], desc:'고개를 들면 보이던 것들.'},
+```
+
+`en`은 큰 영어 제목의 두 줄(두 번째 줄은 기울임체). 그리고 `NEXT_ROOM`의 번호를 하나 올려요.
+
+## 배경음악 바꾸기
+
+`music/`에 파일을 넣고, `index.html`의 `const MUSIC_SRC = ...` 경로를 바꿔요.
+공개 사이트에서는 **자유 이용 녹음**(퍼블릭 도메인, CC0, CC BY)만 쓰고, CC BY면 연주자를 표기해요.
+
+---
+
+## 배포 (Vercel)
+
+1. GitHub에 이 폴더를 저장소로 올리기
+2. vercel.com → GitHub로 로그인 → **Add New → Project** → 이 저장소 선택 → **Deploy**
+   (프레임워크 설정 없음, 빌드 명령 없음 — 그대로 Deploy)
+3. 이후 저장소에 바뀐 파일이 올라가면 1분 안에 사이트가 자동으로 갱신돼요.
+4. 도메인 연결: Vercel 프로젝트 → Settings → Domains
+
+## 쓰는 기술
+
+GSAP 3.12.5 + ScrollTrigger (애니메이션), Lenis 1.1.13 (부드러운 스크롤),
+Google Fonts — Cormorant Garamond, Noto Serif KR, Noto Sans KR, Share Tech Mono.
+빌드 과정 없는 HTML 한 장이라, 파일만 바꾸면 바로 반영돼요.

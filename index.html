@@ -1,0 +1,758 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Vantyr가 직접 찍은 사진을 시리즈별 전시실에 걸어 두는 온라인 사진 전시관.">
+<meta property="og:title" content="Vantyr Archive">
+<meta property="og:description" content="Photographs by Vantyr — 사진을 한 장씩 걸어 두는 작은 전시관.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230D1017'/%3E%3Cline x1='8' y1='34' x2='56' y2='34' stroke='%2393BCE6' stroke-width='2'/%3E%3Ctext x='32' y='28' font-family='Georgia,serif' font-size='26' fill='%23E8E4DC' text-anchor='middle'%3EV%3C/text%3E%3C/svg%3E">
+<title>Vantyr Archive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Noto+Serif+KR:wght@300&family=Noto+Sans+KR:wght@400;500&family=Share+Tech+Mono&display=swap">
+<style>
+/* Layout: an exhibition. Horizon opening → featured work → artist statement → room index →
+   one pinned horizontal "room" per series → full catalogue of works → footer.
+   Single night look by choice: a blue-black gallery where the photographs carry the color. */
+:root{
+  --paper:#0D1017;      /* gallery dark, blue-black */
+  --paper-2:rgba(24,30,42,.55); /* room band, lets the aura through */
+  --panel:#141924;      /* solid surfaces */
+  --ink:#E8E4DC;        /* moonlight white */
+  --ink-soft:#A0A7B4;   /* captions, meta (lifted for legibility on dark) */
+  --line:rgba(232,228,220,.12);
+  --sky:#93BCE6;        /* accent: pale moon blue */
+  --sky-ink:#A9CBEE;
+  --glow:rgba(147,188,230,.28);
+  --f-display:"Cormorant Garamond","Times New Roman",serif;
+  --f-kserif:"Noto Serif KR","Apple SD Gothic Neo",serif;
+  --f-body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-stamp:"Share Tech Mono",ui-monospace,"Consolas",monospace; /* echoes the camera date stamp */
+  --gutter:clamp(20px,5.5vw,80px);
+  --ease:cubic-bezier(.22,1,.36,1);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+[hidden]{display:none!important}
+html{background:var(--paper)}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.8;-webkit-font-smoothing:antialiased;overflow-x:hidden;word-break:keep-all;overflow-wrap:anywhere}
+img{display:block;max-width:100%}
+a{color:inherit}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--sky);outline-offset:3px}
+.wrap{padding-left:max(var(--gutter),env(safe-area-inset-left,0px));padding-right:max(var(--gutter),env(safe-area-inset-right,0px))}
+.label{font-family:var(--f-display);font-weight:600;font-size:14px;letter-spacing:.26em;text-transform:uppercase;line-height:1.4}
+.cap{font-size:14px;line-height:1.55;letter-spacing:.02em}
+.stamp{font-family:var(--f-stamp);font-size:14px;letter-spacing:.1em;color:var(--sky-ink);white-space:nowrap;font-variant-numeric:tabular-nums}
+.line{display:block;overflow:hidden;padding-bottom:.06em}
+.line>span{display:block}
+.glow{text-shadow:0 0 50px var(--glow)}
+
+/* ---------- Atmosphere: drifting light, film grain ---------- */
+.aura{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.aura i{position:absolute;width:62vmax;height:62vmax;border-radius:50%;filter:blur(70px)}
+.aura i:nth-child(1){background:radial-gradient(circle,rgba(104,138,214,.34),transparent 64%);left:-18vmax;top:8vh;animation:drift1 38s ease-in-out infinite alternate}
+.aura i:nth-child(2){background:radial-gradient(circle,rgba(168,138,214,.22),transparent 64%);right:-22vmax;top:55vh;animation:drift2 46s ease-in-out infinite alternate}
+.aura i:nth-child(3){background:radial-gradient(circle,rgba(112,196,212,.15),transparent 64%);left:28vw;bottom:-34vmax;animation:drift1 54s ease-in-out infinite alternate-reverse}
+@keyframes drift1{to{transform:translate(18vw,-12vh) scale(1.2)}}
+@keyframes drift2{to{transform:translate(-16vw,-20vh) scale(.85)}}
+.grain{position:fixed;inset:-60px;z-index:95;pointer-events:none;opacity:.07;mix-blend-mode:overlay;animation:grain .9s steps(5) infinite}
+@keyframes grain{0%{transform:translate(0,0)}20%{transform:translate(-22px,14px)}40%{transform:translate(18px,-26px)}60%{transform:translate(-12px,-8px)}80%{transform:translate(26px,20px)}100%{transform:translate(0,0)}}
+main,footer,.hero{position:relative;z-index:1}
+
+/* ---------- Opening: the horizon ---------- */
+.loader{position:fixed;inset:0;z-index:100}
+.loader .lid{position:absolute;left:0;right:0;height:50.5%;background:var(--paper)}
+.loader .lid.top{top:0}
+.loader .lid.bot{bottom:0}
+.loader .horizon{position:absolute;left:0;right:0;top:50%;height:1px;margin-top:-.5px;background:linear-gradient(90deg,transparent,var(--sky) 18%,var(--ink) 50%,var(--sky) 82%,transparent);box-shadow:0 0 18px var(--glow);transform:scaleX(0)}
+.loader .slit{position:absolute;left:0;right:0;top:50%;height:0;overflow:hidden;background:var(--paper)}
+.loader .slit img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;filter:saturate(.8) brightness(.9)}
+.loader .slit img.on{opacity:1}
+.loader .hz-top{position:absolute;left:16px;right:16px;bottom:calc(50% + 30px);display:grid;justify-items:center;gap:16px;text-align:center}
+.loader h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:clamp(40px,6.4vw,84px);line-height:1;letter-spacing:-.01em;display:flex;flex-wrap:wrap;justify-content:center;text-shadow:0 0 40px var(--glow)}
+.loader h2 span{display:inline-block;white-space:pre}
+.loader .by{color:var(--ink-soft)}
+.loader .tally{position:absolute;right:max(var(--gutter),env(safe-area-inset-right,0px));bottom:calc(50% + 12px);color:var(--ink-soft);opacity:0}
+.loader .skip{position:absolute;left:0;right:0;bottom:calc(28px + env(safe-area-inset-bottom,0px));text-align:center;color:var(--ink-soft);opacity:0}
+
+/* ---------- Mini nav + progress ---------- */
+.mini{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:space-between;align-items:center;gap:20px;padding-top:calc(14px + env(safe-area-inset-top,0px));padding-bottom:14px;background:rgba(13,16,23,.72);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);transform:translateY(-101%);transition:transform .8s var(--ease)}
+.mini.show{transform:none}
+.mini .logo{font-size:22px}
+.mini ul{display:flex;gap:clamp(18px,2.6vw,32px);list-style:none;margin:0;padding:0}
+.mini a{text-decoration:none;transition:color .3s}
+.mini a.cur{color:var(--sky-ink)}
+.mini .progress{position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--sky);transform-origin:left;transform:scaleX(0)}
+
+/* ---------- Hero: the featured work ---------- */
+.hero{height:min(100svh,920px);min-height:560px;overflow:hidden;background:var(--paper)}
+.hero .ph{position:absolute;inset:-6% 0 0 0;height:112%}
+.hero .ph img{width:100%;height:100%;object-fit:cover;object-position:50% 58%;filter:saturate(.85) brightness(.85)}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(13,16,23,.45) 0%,rgba(13,16,23,.05) 25%,rgba(13,16,23,.25) 55%,rgba(13,16,23,1) 100%),radial-gradient(120% 80% at 70% 20%,rgba(147,188,230,.18),transparent 60%);pointer-events:none}
+.nav{position:absolute;z-index:2;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding-top:calc(28px + env(safe-area-inset-top,0px))}
+.logo{font-family:var(--f-display);font-size:28px;line-height:1;text-decoration:none;letter-spacing:.01em}
+.nav ul{display:flex;gap:clamp(18px,3vw,40px);list-style:none;margin:0;padding:0}
+.nav a{text-decoration:none;position:relative}
+.nav a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:currentColor;transform:scaleX(0);transform-origin:right;transition:transform .5s var(--ease)}
+.nav a:hover::after{transform:scaleX(1);transform-origin:left}
+.hero-text{position:absolute;z-index:2;left:0;right:0;bottom:clamp(72px,11vh,120px)}
+.hero h1{margin:18px 0 0;font-family:var(--f-display);font-weight:400;font-size:clamp(64px,11vw,152px);line-height:.88;letter-spacing:-.02em}
+.hero h1 em{font-style:italic}
+.hero-foot{position:absolute;z-index:2;left:0;right:0;bottom:32px;display:flex;justify-content:flex-end;align-items:flex-end;gap:28px}
+.wall{display:grid;gap:2px;text-align:right;padding-right:28px;border-right:1px solid var(--line)}
+.wall b{font-family:var(--f-kserif);font-weight:300;font-size:16px}
+.wall span{color:var(--ink-soft);font-size:13.5px}
+.scroll-cue{display:flex;align-items:center;gap:12px}
+.scroll-cue i{width:1px;height:40px;background:currentColor;opacity:.7;transform-origin:top;animation:cue 2.4s var(--ease) infinite}
+@keyframes cue{0%{transform:scaleY(0)}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* ---------- Statement ---------- */
+.intro{padding-block:clamp(110px,16vw,190px) clamp(90px,12vw,140px);text-align:center;display:grid;justify-items:center;gap:22px}
+.intro .label{color:var(--sky-ink)}
+.intro p.k{margin:0;font-family:var(--f-kserif);font-weight:300;font-size:clamp(26px,3.4vw,42px);line-height:1.5;letter-spacing:-.02em;text-wrap:balance;max-width:22ch}
+.intro p.k .w{display:inline-block}
+.intro p.sub{margin:0;color:var(--ink-soft);max-width:38ch}
+.facts{display:flex;gap:clamp(28px,5vw,64px);margin-top:18px}
+.facts div{display:grid;gap:4px}
+.facts b{font-family:var(--f-display);font-weight:400;font-size:clamp(40px,4.4vw,56px);line-height:1;font-variant-numeric:tabular-nums}
+.facts span{color:var(--ink-soft);font-size:13px}
+
+/* ---------- Room index ---------- */
+.rooms-index{padding-block:0 clamp(90px,12vw,150px)}
+.rooms-index>.label{color:var(--ink-soft);padding-bottom:18px;border-bottom:1px solid var(--line)}
+.ri-list{list-style:none;margin:0;padding:0}
+.ri-row{display:grid;grid-template-columns:120px minmax(0,1fr) auto;align-items:baseline;gap:24px;padding-block:clamp(22px,3vw,36px);border-bottom:1px solid var(--line);text-decoration:none}
+.ri-row .t{font-family:var(--f-display);font-size:clamp(48px,7vw,104px);line-height:.95;letter-spacing:-.02em;transition:transform .8s var(--ease);text-shadow:0 0 50px var(--glow)}
+.ri-row .t em{font-style:italic;transition:color .4s}
+.ri-row .m{color:var(--ink-soft);font-size:14px;text-align:right;display:grid;gap:2px}
+.ri-row .m b{font-family:var(--f-kserif);font-weight:300;color:var(--ink);font-size:16px}
+a.ri-row:hover .t{transform:translateX(18px)}
+a.ri-row:hover .t em{color:var(--sky-ink)}
+.ri-row.soon{opacity:.4}
+.ri-row .th{display:none}
+.float{position:fixed;left:0;top:0;z-index:40;width:260px;aspect-ratio:4/5;pointer-events:none;overflow:hidden;opacity:0;transform:translate(-50%,-50%) scale(.85);transition:opacity .4s,transform .6s var(--ease)}
+.float.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.float img{width:100%;height:100%;object-fit:cover}
+@media (hover:none),(pointer:coarse){.float{display:none}}
+.curtain{position:fixed;inset:0;z-index:99;visibility:hidden;background:var(--panel);display:grid;place-items:center;transform:translateY(100%);pointer-events:none}
+.curtain div{text-align:center;display:grid;gap:14px}
+.curtain h3{margin:0;font-family:var(--f-display);font-weight:400;font-size:clamp(48px,8vw,110px);line-height:1;text-shadow:0 0 50px var(--glow)}
+.curtain h3 em{font-style:italic}
+
+/* ---------- A room (one series, walked horizontally) ---------- */
+.room{background:var(--paper-2);position:relative;overflow:hidden}
+.room + .room{border-top:1px solid var(--line)}
+.room-inner{height:min(100svh,900px);min-height:640px;position:relative;display:flex;align-items:center}
+.room-head{position:absolute;left:max(var(--gutter),env(safe-area-inset-left,0px));top:clamp(70px,11vh,110px);z-index:2;width:min(32vw,440px)}
+.room-head h2{margin:14px 0 0;font-family:var(--f-display);font-weight:400;font-size:clamp(64px,7.6vw,128px);line-height:.88;letter-spacing:-.02em;text-shadow:0 0 50px var(--glow)}
+.room-head h2 em{font-style:italic}
+.room-head .kt{margin:22px 0 0;font-family:var(--f-kserif);font-weight:300;font-size:22px}
+.room-head p{margin:10px 0 0;color:var(--ink-soft);max-width:30ch}
+.track{display:flex;gap:56px;align-items:flex-end;padding-left:calc(min(32vw,440px) + max(var(--gutter),env(safe-area-inset-left,0px)) + 72px);padding-right:max(var(--gutter),env(safe-area-inset-right,0px));will-change:transform}
+.track-wrap{width:100%;min-width:0;-webkit-mask-image:linear-gradient(90deg,transparent 0,transparent calc(min(32vw,440px) + var(--gutter) - 20px),#000 calc(min(32vw,440px) + var(--gutter) + 110px));mask-image:linear-gradient(90deg,transparent 0,transparent calc(min(32vw,440px) + var(--gutter) - 20px),#000 calc(min(32vw,440px) + var(--gutter) + 110px))}
+.work-card{flex:none;margin:0;cursor:pointer;width:min-content}
+.work-card .frame{height:clamp(300px,52vh,520px);aspect-ratio:var(--r,1);max-width:70vw}
+.room-foot{position:absolute;left:0;right:0;bottom:40px;display:flex;justify-content:space-between;z-index:2;pointer-events:none}
+.room-foot .hint{color:var(--sky-ink)}
+.room-bar{flex:1;max-width:420px;height:1px;background:var(--line);margin:0 32px;align-self:center;position:relative}
+.room-bar i{position:absolute;inset:0;background:var(--sky);transform-origin:left;transform:scaleX(0);box-shadow:0 0 10px var(--glow)}
+.exit{flex:none;align-self:center;display:grid;gap:14px;text-decoration:none;padding:28px 0 28px 36px;border-left:1px solid var(--line);min-width:260px}
+.exit .t{font-family:var(--f-display);font-size:clamp(40px,4vw,64px);line-height:1;text-shadow:0 0 50px var(--glow);transition:transform .8s var(--ease)}
+.exit .t em{font-style:italic}
+.exit:hover .t{transform:translateX(14px)}
+.exit .k{color:var(--ink-soft)}
+
+/* frames + wall labels shared by rooms and catalogue */
+.frame{overflow:hidden;background-color:var(--line);background-size:cover;background-position:center}
+.frame img{width:100%;height:100%;object-fit:cover;filter:saturate(.8) brightness(.88)}
+.js .frame img{opacity:0;transition:opacity .9s var(--ease),transform 1.4s var(--ease),filter 1.2s var(--ease)}
+.js .frame img.loaded{opacity:1}
+.work-card:hover img,.g-item:hover img{transform:scale(1.035);filter:saturate(1) brightness(1)}
+.label-card{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 16px;margin-top:14px;align-items:baseline}
+.label-card .no{grid-row:span 2}
+.label-card b{font-family:var(--f-kserif);font-weight:300;font-size:16px}
+.label-card span{color:var(--ink-soft);font-size:13.5px}
+
+/* ---------- Place marquee ---------- */
+.marquee{overflow:hidden;padding-block:clamp(56px,8vw,104px) 0}
+.mq-track{display:flex;width:max-content;animation:mq 50s linear infinite}
+.mq-track span{font-family:var(--f-display);font-style:italic;font-size:clamp(52px,9vw,136px);line-height:1;white-space:nowrap;padding-right:.35em}
+.mq-track b{font-family:var(--f-stamp);font-style:normal;font-weight:400;font-size:.32em;letter-spacing:.1em;color:var(--sky-ink);vertical-align:.9em;padding:0 .9em}
+@keyframes mq{to{transform:translateX(-50%)}}
+
+/* ---------- Catalogue (all works) ---------- */
+.works{padding-block:clamp(90px,11vw,140px) clamp(110px,13vw,170px)}
+.works-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:24px 40px;margin-bottom:clamp(40px,5vw,64px)}
+.works-head h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:clamp(44px,5vw,62px);line-height:1;text-shadow:0 0 50px var(--glow)}
+.works-head h2 em{font-style:italic}
+.controls{display:flex;flex-wrap:wrap;gap:16px 40px;align-items:center}
+.seg{display:flex;gap:clamp(16px,2.2vw,30px);list-style:none;margin:0;padding:0;position:relative}
+.seg button{all:unset;cursor:pointer;font-size:14px;color:var(--ink-soft);padding:6px 2px;transition:color .3s;white-space:nowrap}
+.seg button[aria-pressed="true"]{color:var(--ink)}
+.seg button:focus-visible{outline:2px solid var(--sky);outline-offset:3px}
+.seg .ul{position:absolute;bottom:-2px;height:2px;width:16px;background:var(--sky);left:0;transition:transform .6s var(--ease)}
+.view .label{font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(20px,4vw,64px);row-gap:clamp(64px,9vw,120px);align-items:end}
+.g-item{margin:0;min-width:0;cursor:pointer}
+.g-a{grid-column:1 / span 7} .g-a .frame{aspect-ratio:4/3}
+.g-b{grid-column:9 / span 4;align-self:start;margin-top:-4vw} .g-b .frame{aspect-ratio:3/4}
+.g-c{grid-column:1 / -1} .g-c .frame{aspect-ratio:21/9}
+.g-d{grid-column:3 / span 4} .g-d .frame{aspect-ratio:3/4}
+.g-e{grid-column:8 / span 5} .g-e .frame{aspect-ratio:4/3}
+.g-quote{grid-column:2 / span 9;margin:clamp(8px,2vw,24px) 0;font-family:var(--f-kserif);font-weight:300;font-size:clamp(28px,3.8vw,52px);line-height:1.45;letter-spacing:-.02em;text-wrap:balance}
+.g-quote b{font-weight:300;color:var(--sky-ink)}
+.g-quote .q-by{display:block;margin-top:22px}
+.list{border-top:1px solid var(--ink)}
+.l-row{display:grid;grid-template-columns:90px 64px minmax(0,1.4fr) minmax(0,1fr) minmax(0,1fr) 110px;gap:20px;align-items:center;padding-block:14px;border-bottom:1px solid var(--line);cursor:pointer;transition:background .4s}
+.l-row:hover,.l-row:focus-visible{background:rgba(232,228,220,.04)}
+.l-row .th{width:64px;height:48px}
+.l-row b{font-family:var(--f-kserif);font-weight:300;font-size:17px}
+.l-row span{color:var(--ink-soft);font-size:13px}
+.empty{grid-column:1/-1;text-align:center;padding-block:80px;color:var(--ink-soft);display:grid;gap:10px;justify-items:center}
+.empty strong{font-family:var(--f-kserif);font-weight:300;font-size:24px;color:var(--ink)}
+.note{margin-top:clamp(64px,8vw,100px);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;color:var(--ink-soft)}
+.note b{font-weight:500;color:var(--ink)}
+
+/* ---------- Footer ---------- */
+footer{border-top:1px solid var(--line);padding-block:clamp(56px,8vw,96px) calc(48px + env(safe-area-inset-bottom,0px))}
+footer .big{font-family:var(--f-display);font-weight:400;font-size:clamp(56px,13.5vw,220px);line-height:.85;letter-spacing:-.03em;margin:0 0 clamp(36px,5vw,64px);text-shadow:0 0 60px var(--glow)}
+footer .big em{font-style:italic}
+.foot-row{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:20px}
+.contact{display:flex;flex-wrap:wrap;gap:20px 56px;list-style:none;margin:0;padding:0}
+.contact li{display:grid;gap:6px}
+.contact .label{color:var(--ink-soft);font-size:12px}
+.contact a,.contact #mailAddr{font-family:var(--f-kserif);font-weight:300;font-size:20px;text-decoration:none;user-select:all}
+.contact a:hover{color:var(--sky-ink)}
+.mail{display:flex;align-items:baseline;gap:14px}
+.copy{all:unset;cursor:pointer;font-size:12px;padding:4px 0;border-bottom:1px solid currentColor}
+.copy:focus-visible{outline:2px solid var(--sky);outline-offset:3px}
+.foot-row small{color:var(--ink-soft);font-size:13px}
+
+/* ---------- Cursor, viewing room (lightbox), sound ---------- */
+.cursor{position:fixed;left:0;top:0;z-index:60;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:var(--ink);pointer-events:none;display:grid;place-items:center;transition:width .45s var(--ease),height .45s var(--ease),margin .45s var(--ease),background .45s;opacity:0}
+.cursor span{font-family:var(--f-display);font-weight:600;font-size:12px;letter-spacing:.22em;color:var(--ink);opacity:0;transition:opacity .3s}
+.cursor.on{width:84px;height:84px;margin:-42px 0 0 -42px;background:rgba(232,228,220,.12);border:1px solid rgba(232,228,220,.5);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.cursor.on span{opacity:1}
+@media (hover:none),(pointer:coarse){.cursor{display:none}}
+.lb{position:fixed;inset:0;z-index:80;background:rgba(9,11,16,.97);display:grid;grid-template-columns:minmax(0,1fr) 300px;grid-template-rows:auto minmax(0,1fr) auto;gap:0 clamp(24px,4vw,56px);padding:calc(20px + env(safe-area-inset-top,0px)) max(var(--gutter),env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(var(--gutter),env(safe-area-inset-left,0px))}
+.lb-top{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center}
+.lb button{all:unset;cursor:pointer;padding:8px 2px}
+.lb button:focus-visible{outline:2px solid var(--sky);outline-offset:3px}
+.lb-stage{min-height:0;display:grid;place-items:center;padding-block:20px}
+.lb-stage img{max-height:100%;max-width:100%;object-fit:contain;width:auto;height:auto}
+.lb-label{align-self:end;padding-bottom:20px;display:grid;gap:10px;border-left:1px solid var(--line);padding-left:24px}
+.lb-label h3{margin:0;font-family:var(--f-kserif);font-weight:300;font-size:26px;line-height:1.35}
+.lb-label dl{margin:8px 0 0;display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-size:13px}
+.lb-label dt{color:var(--ink-soft)}
+.lb-label dd{margin:0}
+.lb-label p{margin:10px 0 0;color:var(--ink-soft);font-size:14px}
+.lb-bot{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:28px}
+.lb-nav{display:flex;gap:28px}
+.thumbs{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;min-width:0}
+.thumbs::-webkit-scrollbar{display:none}
+.thumbs button{all:unset;cursor:pointer;flex:none;width:52px;height:40px;opacity:.4;transition:opacity .3s;outline-offset:2px}
+.thumbs button[aria-current="true"]{opacity:1;box-shadow:0 0 0 1px var(--sky)}
+.thumbs button:hover{opacity:.8}
+.thumbs button:focus-visible{outline:2px solid var(--sky)}
+.thumbs img{width:100%;height:100%;object-fit:cover}
+.snd{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:9px;padding:6px 0 6px 14px;margin-left:clamp(10px,2vw,28px);border-left:1px solid var(--line);white-space:nowrap}
+.snd:focus-visible{outline:2px solid var(--sky);outline-offset:3px}
+.nav-r{display:flex;align-items:center}
+.snd .bars{display:flex;gap:2px;align-items:flex-end;height:12px}
+.snd .bars i{width:2px;height:3px;background:var(--sky-ink)}
+.snd[aria-pressed="true"] .bars i{animation:bar 1.1s ease-in-out infinite}
+.snd[aria-pressed="true"] .bars i:nth-child(2){animation-delay:.2s}
+.snd[aria-pressed="true"] .bars i:nth-child(3){animation-delay:.45s}
+.snd[aria-pressed="true"] .bars i:nth-child(4){animation-delay:.1s}
+@keyframes bar{0%,100%{height:3px}50%{height:12px}}
+
+/* ---------- Narrow screens ---------- */
+@media (max-width:900px){
+  .nav ul{display:none}
+  .mini ul{display:none}
+  .wall{display:none}
+  .facts{gap:28px}
+  .ri-row{grid-template-columns:72px minmax(0,1fr);gap:6px 16px;align-items:center}
+  .ri-row .th{display:block;grid-row:span 3;width:72px;height:90px;object-fit:cover;filter:saturate(.85) brightness(.9)}
+  .ri-row .t{font-size:clamp(36px,10vw,52px)}
+  .ri-row .m{text-align:left}
+  .ri-row.soon{grid-template-columns:minmax(0,1fr)}
+  .seg button{padding:10px 2px}
+  .snd .snd-t{display:none}
+  .snd{padding-left:12px}
+  .exit{min-width:62vw;padding-left:24px}
+  .room-bar{display:none}
+  .room-foot .hint{display:none}
+  .label-card b{font-size:17px}
+  .thumbs{display:none}
+  .room-inner{height:auto;min-height:0;display:block;padding-block:72px 64px}
+  .room-head{position:static;width:auto;padding-left:max(var(--gutter),env(safe-area-inset-left,0px));padding-right:max(var(--gutter),env(safe-area-inset-right,0px));margin-bottom:36px}
+  .room-head h2{font-size:clamp(56px,16vw,92px)}
+  .track-wrap{-webkit-mask-image:none;mask-image:none}
+  .track{padding-left:max(var(--gutter),env(safe-area-inset-left,0px));gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;align-items:flex-start}
+  .track::-webkit-scrollbar{display:none}
+  .work-card{scroll-snap-align:start;width:76vw}
+  .work-card .frame{height:auto;width:100%;aspect-ratio:4/5;max-width:none}
+  .room-foot{position:static;margin-top:28px;padding-left:max(var(--gutter),env(safe-area-inset-left,0px));padding-right:max(var(--gutter),env(safe-area-inset-right,0px))}
+  .grid{row-gap:56px}
+  .g-a,.g-c,.g-e,.g-quote{grid-column:1/-1} .g-c .frame{aspect-ratio:16/10}
+  .g-b,.g-d{grid-column:3/-1;margin-top:0}
+  .l-row{grid-template-columns:64px minmax(0,1fr) auto;gap:14px}
+  .l-row .c-no,.l-row .c-series,.l-row .c-place{display:none}
+  .lb{grid-template-columns:minmax(0,1fr)}
+  .lb-label{border-left:0;padding-left:0;border-top:1px solid var(--line);padding-top:14px}
+  .lb-label dl{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<div class="mini wrap" id="mini">
+  <a class="logo" href="#top">Vantyr Archive</a>
+  <div class="nav-r"><ul class="label">
+    <li><a href="#about">About</a></li>
+    <li><a href="#rooms">Rooms</a></li>
+    <li><a href="#works">Works</a></li>
+  </ul><button class="snd label" type="button" aria-pressed="false"><span class="bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="snd-t">Sound off</span></button></div>
+  <i class="progress" id="progress" aria-hidden="true"></i>
+</div>
+
+<header class="hero" id="top">
+  <div class="ph" data-parallax><img id="heroImg" alt="" fetchpriority="high"></div>
+  <nav class="nav wrap" aria-label="주요 메뉴">
+    <a class="logo" href="#top">Vantyr Archive</a>
+    <div class="nav-r"><ul class="label">
+      <li><a href="#about">About</a></li>
+      <li><a href="#rooms">Rooms</a></li>
+      <li><a href="#works">Works</a></li>
+    </ul><button class="snd label" type="button" aria-pressed="false"><span class="bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="snd-t">Sound off</span></button></div>
+  </nav>
+  <div class="hero-text wrap">
+    <div class="label line"><span>Photographs by Vantyr</span></div>
+    <h1><span class="line"><span>Light, after</span></span><span class="line"><span><em>the rain.</em></span></span></h1>
+  </div>
+  <div class="hero-foot wrap">
+    <div class="wall" id="heroWall"></div>
+    <div class="scroll-cue label" aria-hidden="true">Scroll <i></i></div>
+  </div>
+</header>
+
+<main>
+  <section class="intro wrap" id="about">
+    <div class="label">About this archive</div>
+    <p class="k" data-words>머물렀던 자리에 남은 빛을 한 장씩 걸어 둡니다.</p>
+    <p class="sub">Vantyr가 직접 찍은 사진을 모아 두는 작은 전시관입니다. 작품은 시리즈별 전시실에 걸리고, 새로 찍을 때마다 늘어납니다.</p>
+    <div class="facts" id="facts"></div>
+  </section>
+
+  <section class="rooms-index wrap" id="rooms" aria-label="전시실">
+    <div class="label">Rooms</div>
+    <ol class="ri-list" id="riList"></ol>
+  </section>
+
+  <div id="roomsWrap"></div>
+
+  <div class="marquee" aria-hidden="true"><div class="mq-track" id="mq"></div></div>
+
+  <section class="works wrap" id="works">
+    <div class="works-head">
+      <h2>All <em>works</em></h2>
+      <div class="controls">
+        <ul class="seg" id="segSeries" aria-label="시리즈 필터"></ul>
+        <ul class="seg view" id="segView" aria-label="보기 방식"></ul>
+      </div>
+    </div>
+    <div id="catalogue"></div>
+    <div class="note cap"><span><b id="total">0</b>점의 작품 · 날짜가 남은 마지막 기록 <span id="lastDate"></span></span><span>작품을 누르면 크게 볼 수 있어요</span></div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <p class="big"><span class="line"><span>Vantyr <em>Archive</em></span></span></p>
+  <div class="foot-row">
+    <ul class="contact">
+      <li><span class="label">Instagram</span><a href="https://www.instagram.com/fzon194/" target="_blank" rel="noopener">@fzon194 ↗</a></li>
+      <li><span class="label">Email</span><span class="mail"><span id="mailAddr">aha194@naver.com</span><button type="button" class="copy stamp" id="copyMail">Copy</button></span></li>
+    </ul>
+    <small>© 2026 Vantyr Archive. 모든 사진은 직접 촬영했습니다.</small>
+  </div>
+</footer>
+
+<div class="aura" aria-hidden="true"><i></i><i></i><i></i></div>
+<div class="grain" id="grain" aria-hidden="true"></div>
+<div class="float" id="float" aria-hidden="true"><img alt=""></div>
+<div class="curtain" id="curtain" aria-hidden="true"><div><span class="stamp" id="curNo"></span><h3 id="curTitle"></h3></div></div>
+<div class="cursor" id="cursor" aria-hidden="true"><span>VIEW</span></div>
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="작품 보기" hidden>
+  <div class="lb-top"><span class="stamp" id="lbCount"></span><button class="label" id="lbClose">Close</button></div>
+  <div class="lb-stage"><img id="lbImg" alt=""></div>
+  <div class="lb-label">
+    <span class="stamp" id="lbNo"></span>
+    <h3 id="lbTitle"></h3>
+    <dl><dt>장소</dt><dd id="lbPlace"></dd><dt>촬영</dt><dd id="lbDate"></dd><dt>시리즈</dt><dd id="lbSeries"></dd></dl>
+    <p id="lbNote"></p>
+  </div>
+  <div class="lb-bot"><div class="thumbs" id="lbThumbs" aria-label="작품 썸네일"></div><div class="lb-nav"><button class="label" id="lbPrev">← Prev</button><button class="label" id="lbNext">Next →</button></div></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+/* =========================================================
+   전시 데이터 — 새 작품은 WORKS에 한 줄, 새 전시실은 SERIES에 한 줄
+   ========================================================= */
+const SERIES = [
+  {id:'sea',     no:'01', title:'바다와 바람',   en:['Sea &','Wind'],   desc:'바람을 맞으며 파도 앞에 서 있던 시간들.'},
+  {id:'transit', no:'02', title:'이동하는 순간', en:['In','Transit'],    desc:'어딘가로 향하는 동안 스쳐 간 장면들.'},
+  {id:'night',   no:'03', title:'밤의 거리',     en:['After','Dark'],    desc:'불빛만 남은 늦은 밤의 길 위에서.'},
+  {id:'lines',   no:'04', title:'소실점',        en:['Vanishing','Point'], desc:'끝이 한 점으로 모이는 길과 틈.'},
+];
+const NEXT_ROOM = {no:'05', title:'다음 전시실', note:'새로 찍은 사진이 모이면 열립니다'};
+/* note = 그때의 한 줄 기록, r = 사진 가로/세로 비율 */
+const WORKS = [
+  {no:1, series:'transit', src:'photos/airport.jpg',  r:.99,  title:'떠나기 전',          place:'공항',          date:'2026.10.27', season:'가을', note:'비몽사몽, 멍하니 앉아 있던 대합실', alt:'공항 대합실 창 너머로 보이는 산과 활주로'},
+  {no:2, series:'transit', src:'photos/cabin.jpg',    r:.753, title:'기내',              place:'비행기 안',      date:'2026.10.27', season:'가을', note:'제주에 다시 왔구나, 실감한 순간', alt:'승객들이 짐을 정리하는 비행기 기내'},
+  {no:3, series:'transit', src:'photos/bus.jpg',      r:.753, title:'이동하는 길',        place:'버스 안',        date:'2026.10.27', season:'가을', note:'설렘이 가득했던 길', alt:'주황색 커튼이 달린 관광버스 내부'},
+  {no:4, series:'transit', src:'photos/show.jpg',     r:1,    title:'오후의 공연',        place:'제주',          date:'2026.10.27', season:'가을', note:'기대보다 훨씬 재밌었던 공연', alt:'숲을 배경으로 말을 탄 배우들이 펼치는 야외 공연'},
+  {no:5, series:'sea',     src:'photos/biyangdo.jpg', r:1,    title:'비양도가 보이는 오후', place:'제주 협재',      date:'2026.10.27', season:'가을', note:'바람을 맞으며 파도와 함께', alt:'에메랄드빛 파도 너머로 보이는 비양도'},
+  {no:6, series:'sea',     src:'photos/turbines.jpg', r:.754, title:'바다 위의 바람개비',  place:'제주 서쪽 바다',  date:'2026.10.27', season:'가을', note:'현무암 너머 수평선', alt:'현무암 해안 너머 수평선에 늘어선 해상 풍력발전기'},
+  {no:7, series:'sea',     src:'photos/waves.jpg',    r:1.327,title:'밀려오는 것들',      place:'제주 바다',      date:'2026.10.27', season:'가을', note:'바람을 맞으며 파도와 함께', alt:'하얗게 부서지는 파도와 멀리 보이는 풍력발전기'},
+  {no:8, series:'sea',     src:'photos/hyeopjae.jpg', r:1,    title:'구름이 낮던 날',      place:'제주 협재',      date:'2026.10.27', season:'가을', note:'애니메이션 속 한 장면 같던 색감, 보자마자 이거다 싶었던 순간', alt:'구름이 낮게 깔린 협재 해변과 현무암 해안', featured:true},
+  {no:9, series:'sea',     src:'photos/island.jpg',   r:1,    title:'섬이 보이는 언덕',     place:'제주',          date:'2026.10.28', season:'가을', note:'', alt:'잔디 언덕과 야자수 너머로 보이는 푸른 바다와 작은 섬'},
+  {no:10,series:'transit', src:'photos/flight.jpg',   r:1,    title:'돌아오는 하늘',       place:'비행기 안',      date:'2026.10.28', season:'가을', note:'', alt:'어두운 비행기 창 너머 수평선에 남은 주황빛 노을'},
+  /* 날짜가 없는 작품은 date:'' 로 두면 'Undated'로 표시돼요 */
+  {no:11,series:'sea',     src:'photos/beachwalk.jpg', r:1,     title:'바다를 걷는 사람',   place:'바닷가',  date:'', season:'', note:'', alt:'맑은 하늘 아래 파도가 밀려오는 모래사장을 걷는 사람'},
+  {no:12,series:'night',   src:'photos/schoolzone.jpg',r:.75,   title:'200m 앞',          place:'밤의 동네 길', date:'', season:'', note:'', alt:'가로등과 은행나무가 늘어선 밤의 어린이보호구역 도로와 200m 표지판'},
+  {no:13,series:'night',   src:'photos/taillights.jpg',r:1.333, title:'멀어지는 불빛',      place:'밤길',     date:'', season:'', note:'', alt:'어둠 속에서 흔들리며 멀어지는 자동차의 붉은 후미등'},
+  {no:14,series:'transit', src:'photos/bridge.jpg',    r:.75,   title:'구름 쪽으로',        place:'다리 위',   date:'', season:'', note:'', alt:'거대한 구름을 향해 다리 위를 달리는 자동차와 오토바이'},
+  {no:15,series:'lines',   src:'photos/corridor.jpg',  r:1.097, title:'붉은 기둥 사이',     place:'회랑',     date:'', season:'', note:'', alt:'붉은 기둥과 단청이 끝까지 이어지다 빛으로 열리는 긴 회랑'},
+  {no:16,series:'night',   src:'photos/parklamp.jpg',  r:.75,   title:'가로등 아래 계단',    place:'밤의 공원', date:'', season:'', note:'', alt:'앙상한 나무 사이 가로등 하나가 비추는 밤 공원의 계단'},
+  {no:17,series:'transit', src:'photos/bluebus.jpg',   r:1.333, title:'파란 버스',          place:'시골길',    date:'', season:'', note:'', alt:'앙상한 나무가 선 시골길을 달려오는 파란 버스'},
+  {no:18,series:'lines',   src:'photos/alley.jpg',     r:1.333, title:'틈',               place:'골목',     date:'', season:'', note:'', alt:'낡은 벽 두 개 사이로 좁게 난 골목길'},
+];
+const QUOTE = {text:'바람을 맞으며, <b>파도와 같이</b> 있던 오후.', from:5};
+
+document.documentElement.classList.add('js');
+const LQ = {"beachwalk": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAAYABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwBiRirEcYrDF/ceqj/gNSrqFz2cfkK6OcwsdHDGKKwF1K6EkaFz85IBAHpmilzDsPAVPuYB9lH+FPEsijIJA9QAP6UUVxXZ1WRE8bPhxIxIOR8x4NFFFF2Fj//Z", "schoolzone": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAAYABIDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDmNn+i785bIAGegq1FdSSThJlU7RxtGOnFSxWQ3qztuCjGG6Gi5jigXIGX9Rmp9QITJkk560U0RgqDk80UXCxswjgbynqB3pt3ZeeVLsvIHA7Dmiioi76ltWGrbsqhQeAMdP8A61FFFVYR/9k=", "taillights": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAASABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDgMUU5TtOeD9aGbcOQM+tIBtFFFMAooooAO1FFFAH/2Q==", "bridge": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAAYABIDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwCtto21btdQhiOJIgV9M025mt2BaIAeo6EVrznPyFbFFOyvqfyoo5g5TP8Au4y4OOwA/U96WMYXCnB96KKwNxfOmHHlN+GaKKKVx2P/2Q==", "corridor": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAAWABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDkLiEoT8oz3JGc1X2n0H5f/XrpbyK0lBCkhxnP1yf6EUo8PQ/2H9vMx8zzdm3HGKyUjqqULO66mDDAWHAwT1I44oroLKKyhU+eN42OOvcgbf1oqLtm3slHRFacrDChVfmK8n1IJFM/tCX7CYM/Jv3Y96KK6mkcrk3uOto0uSVfIAVn47kDI/WiiiokkdFNt7n/2Q==", "parklamp": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAAYABIDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDgmXFIQQcEYNW2tJpXJSPIJwCOlJLa3JJeROvcmldAVttFWREdo4oouBuI0UZzHblT6qxFJLIkv34mbH95yaKKmw0RYh/59z/30aKKKRfKf//Z", "bluebus": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAASABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwCWa7lITiNkztIVuxqLVNRERVWhZUODwRkVCunlyCxC+vepJNLZwNjqcf8APRcis1JX1NGtNBsF+qgrAZl6Zz0x9aKmtbKaH/XSwsn9wIQDRRJq+gJPqWYeXGalXljmiipe5Yx+d2aKKKAP/9k=", "alley": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAASABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwC3ZWETxkMAVDk4HTr6VFqXieaxDaXaR4lP7tZN33AT1A9eauabNG0DMHGAx68VyWsyuuvTyouYhIGyPoKxTNEiSWyYo6iQ7ic725NFXzLEU37uPais7s2shQqjooH4UMADwAKKK0II/X60UUUgP//Z", "island": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAAYABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDZk0lsZAqs+lyA9Ka3i9ggPlQjjP3qrTeLXZdqiNSw4IBOK6faPqcvIiZtNkH8NFUU8S3IDEyLLx90piik61twVO5XF3pg6LFx6JQNSsB0xx/sUUV5nsl3OrmY4X1hKMZT6EUUUVLppD5j/9k=", "flight": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAAYABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDhLbaJgz/dXmtvRbQzJJcEffbArBBxXRWF81pZxxJgYGaTv0Hoy7PbC3tpJ5B8qDNFZGr6vLdQi23DZnLYooTfUGl0MapDMxH3j+dFFMRGTmiiigD/2Q==", "hyeopjae": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAAYABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDShtIogHYLIf7uashbYjebfbIvQAcVPGoA4UH605gpHCqPoKpyvuSlYoXEztnagUelFWpCNmCq89CKKV49g17mIsbOo3XdwPo5pZIZAhK3sq+ueaKKxNTIuJCj/wDIT5XoM0UUVdhH/9k=", "biyangdo": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAAYABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDT4o4qhPdXRAMEKhR1LnrVU3Opbwf3ePTHBrS5lobPFFU470lf3kR3eiHNFO4tB6uO0YH5UZYjv+dFFYXNrCc9efzoooouFj//2Q==", "turbines": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAAYABIDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDR2ijaKWjpW1zGweWKKM0UrsdkZSat5oPlYH+8MUp1QrgEx5PYc0UUrjsM/tk/3V/Wiiii4WP/2Q==", "waves": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAASABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwB1oq45q9sQryKy7Yx7MNMxP/XP/A1a84IxClWHbcrDH61vdGTTC7jQ5IUCiqd1I+4nzVHthsfzoqW0NXKlv0FW+1FFQUVLknB5NFFFIo//2Q==", "airport": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAAYABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwCC2slkkfjp71P/AGepdMr/ABkfoak0+3uWnm2KhIx1kI9fap7trmyjE08abFlI+WQk5IPtWnOjPkkVrjT7dbKeQqcruA+aiqlxqivBJGQ2Xz39aKm5VmZ0Wtxwux/eDPoaW416GeHyz5g5zyc0UUXCxWF1FImVcfQ8GiiipLP/2Q==", "cabin": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAAYABIDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwCXTLZVul3/AMXFGoSwRPISQBuPel1RLqKNPsIUylhg7gNo9awja3A3w3UO8s3ml1bOT6VVxEhnUkkMv50VmmwumJIt5cHkUUXHYvx6RdScjyR/vH/61Pk0S6AyZbZaKKVx2Kp0u5z/AK+H8zRRRSCx/9k=", "bus": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAAYABIDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwCtp9t5VuDIAdzEL7kdqufYEMXmygBVGWANYcOrQMm26Uq6NlGUZyO4IqxLPrE4TyzDHFwcZXHPQnNVcLExjVjuU8HkfKf8KKz21K+RirMWYHBIUYJop3EdDbWelRv5iWqBgMZyTTruGwlQkxEcclWIx7UUVmWZ/wBjtOyy4/66GiiigD//2Q==", "show": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAAYABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwCOHU0AUNApPfDYp02rjcBbQKPd+abHYQQ/eKEAgEsx6noAKutpx3JGI4x5o+Q7eD9eOKOYWpmz6u7LtMUWcf3TRU7aRuMhDR4Vip69aKVykmUdA16aW8jtrra4fhWxyDW7eXtxbSSzJmSMIoVAOc55/nRRQBGk6eVI+7asjFwpGMZ9aKKKBn//2Q=="};
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const hasGSAP = typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined';
+const $ = s => document.querySelector(s);
+const pad = (n,l=2) => String(n).padStart(l,'0');
+const no = w => 'No. ' + pad(w.no,3);
+const stamp = d => d ? "'" + d.slice(2).replace(/\./g,' ') : 'Undated';
+const fullDate = d => d || '날짜 기록 없음';
+const seriesOf = w => SERIES.find(s=>s.id===w.series);
+const byId = id => WORKS.filter(w=>w.series===id);
+const latest = [...WORKS].sort((a,b)=>b.no-a.no);
+const featured = WORKS.find(w=>w.featured) || latest[0];
+
+function hydrate(root){
+  root.querySelectorAll('.frame').forEach(f=>{
+    const img = f.querySelector('img'); const key = img.getAttribute('src').split('/').pop().replace('.jpg','');
+    if (LQ[key]) f.style.backgroundImage = `url(${LQ[key]})`;
+    const done = ()=>img.classList.add('loaded');
+    if (img.complete && img.naturalWidth) done(); else { img.addEventListener('load',done,{once:true}); img.addEventListener('error',done,{once:true}); }
+  });
+}
+const labelCard = w => `<figcaption class="label-card"><span class="stamp no">${no(w)}</span><b>${w.title}</b><span>${w.place} · ${stamp(w.date)}</span></figcaption>`;
+
+/* ---- Hero: featured work ---- */
+$('#heroImg').src = featured.src; $('#heroImg').alt = featured.alt;
+$('#heroWall').innerHTML = `<span class="stamp">${no(featured)} — Now showing</span><b>${featured.title}</b><span>${featured.place} · ${fullDate(featured.date)}</span>${featured.note ? `<span>${featured.note}</span>` : ''}`;
+
+/* ---- Facts ---- */
+const places = [...new Set(WORKS.map(w=>w.place))];
+$('#facts').innerHTML = `<div><b>${pad(WORKS.length)}</b><span>작품</span></div><div><b>${pad(SERIES.length)}</b><span>전시실</span></div><div><b>${pad(places.length)}</b><span>장소</span></div>`;
+
+/* ---- Room index ---- */
+$('#riList').innerHTML = SERIES.map(s=>{ const ws = byId(s.id);
+  return `<li><a class="ri-row" href="#room-${s.id}" data-room="${s.id}" data-img="${ws[0].src}"><img class="th" src="${ws[0].src}" alt="" loading="lazy"><span class="stamp">Room ${s.no}</span><span class="t">${s.en[0]} <em>${s.en[1]}</em></span><span class="m"><b>${s.title}</b>${pad(ws.length)}점 · ${no(ws[0])}–${pad(ws[ws.length-1].no,3)}</span></a></li>`; }).join('')
+  + `<li><div class="ri-row soon"><span class="stamp">Room ${NEXT_ROOM.no}</span><span class="t">Next <em>room</em></span><span class="m"><b>${NEXT_ROOM.title}</b>${NEXT_ROOM.note}</span></div></li>`;
+
+/* ---- Rooms ---- */
+const exitFor = i => { const nx = SERIES[i+1];
+  return nx ? `<a class="exit" href="#room-${nx.id}"><span class="stamp">Next · Room ${nx.no}</span><span class="t">${nx.en[0]} <em>${nx.en[1]}</em></span><span class="k">${nx.title} →</span></a>`
+            : `<a class="exit" href="#works"><span class="stamp">Exit</span><span class="t">All <em>works</em></span><span class="k">전체 작품 보기 →</span></a>`; };
+$('#roomsWrap').innerHTML = SERIES.map((s,i)=>{ const ws = byId(s.id);
+  return `<section class="room" id="room-${s.id}" aria-label="${s.title}">
+    <div class="room-inner">
+      <div class="room-head"><span class="stamp">Room ${s.no} · ${pad(ws.length)} works</span>
+        <h2><span class="line"><span>${s.en[0]}</span></span><span class="line"><span><em>${s.en[1]}</em></span></span></h2>
+        <p class="kt">${s.title}</p><p>${s.desc}</p></div>
+      <div class="track-wrap"><div class="track">${ws.map(w=>`<figure class="work-card" data-view data-no="${w.no}" data-set="${s.id}" style="--r:${w.r}"><div class="frame"><img src="${w.src}" alt="${w.alt}" loading="lazy"></div>${labelCard(w)}</figure>`).join('')}${exitFor(i)}</div></div>
+    </div>
+    <div class="room-foot wrap label"><span class="stamp count">01 / ${pad(ws.length)}</span><span class="room-bar" aria-hidden="true"><i></i></span><span class="hint">Scroll · ← → keys</span></div>
+  </section>`; }).join('');
+hydrate($('#roomsWrap'));
+
+/* ---- Marquee: every place in the archive ---- */
+const mqText = places.map(p=>`${p}<b>·</b>`).join('');
+$('#mq').innerHTML = `<span>${mqText}</span><span>${mqText}</span>`;
+
+/* ---- Catalogue ---- */
+let curSeries = 'all', curView = 'grid';
+const layout = ['g-a','g-b','g-c','g-d','g-e'];
+$('#segSeries').innerHTML = [['all','전체'],...SERIES.map(s=>[s.id,s.title])].map(([id,t])=>`<li><button type="button" data-v="${id}" aria-pressed="${id===curSeries}">${t}</button></li>`).join('') + '<span class="ul" aria-hidden="true"></span>';
+$('#segView').innerHTML = [['grid','Gallery'],['list','Index']].map(([id,t])=>`<li><button type="button" class="label" data-v="${id}" aria-pressed="${id===curView}">${t}</button></li>`).join('') + '<span class="ul" aria-hidden="true"></span>';
+$('#total').textContent = WORKS.length;
+$('#lastDate').textContent = (WORKS.map(w=>w.date).filter(Boolean).sort().pop()) || '';
+const visible = () => (curSeries==='all' ? WORKS : byId(curSeries)).slice().sort((a,b)=>a.no-b.no);
+function renderCatalogue(){
+  const list = visible(), el = $('#catalogue');
+  if (!list.length){ el.className='grid'; el.innerHTML = `<div class="empty"><strong>아직 걸린 작품이 없어요</strong><span class="cap">새로 찍은 사진이 모이면 이곳에 걸립니다.</span></div>`; return; }
+  if (curView==='list'){
+    el.className = 'list';
+    el.innerHTML = list.map(w=>`<div class="l-row" role="button" tabindex="0" data-view data-no="${w.no}" data-set="cat" aria-label="${w.title} 크게 보기"><span class="stamp c-no">${no(w)}</span><div class="frame th"><img src="${w.src}" alt="" loading="lazy"></div><b>${w.title}</b><span class="c-place">${w.place}</span><span class="c-series">${seriesOf(w).title}</span><span class="stamp">${stamp(w.date)}</span></div>`).join('');
+  } else {
+    el.className = 'grid';
+    const items = list.map((w,i)=>`<figure class="g-item ${layout[i%layout.length]}" data-view data-no="${w.no}" data-set="cat" tabindex="0" role="button" aria-label="${w.title} 크게 보기"><div class="frame"><img src="${w.src}" alt="${w.alt}" loading="lazy"></div>${labelCard(w)}</figure>`);
+    const qw = WORKS.find(w=>w.no===QUOTE.from);
+    if (curSeries==='all' && items.length>=3 && qw) items.splice(2,0,`<blockquote class="g-quote">${QUOTE.text}<span class="stamp q-by">— ${no(qw)} ${qw.title}</span></blockquote>`);
+    el.innerHTML = items.join('');
+  }
+  hydrate(el);
+}
+function moveUL(seg){ const b = seg.querySelector('[aria-pressed="true"]'); seg.querySelector('.ul').style.transform = `translateX(${b.offsetLeft + b.offsetWidth/2 - 8}px)`; }
+function bindSeg(seg, set){
+  seg.addEventListener('click', e=>{ const b = e.target.closest('button'); if(!b || b.getAttribute('aria-pressed')==='true') return;
+    seg.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed', x===b)); moveUL(seg); set(b.dataset.v);
+    const el = $('#catalogue');
+    if (hasGSAP && !reduce){ gsap.to(el,{opacity:0,y:14,duration:.45,ease:'power2.in',onComplete(){ renderCatalogue(); gsap.to(el,{opacity:1,y:0,duration:1.1,ease:'expo.out'}); window.safeRefresh ? safeRefresh() : ScrollTrigger.refresh(); }}); }
+    else renderCatalogue();
+  });
+}
+bindSeg($('#segSeries'), v=>curSeries=v); bindSeg($('#segView'), v=>curView=v);
+renderCatalogue();
+const placeULs = ()=>{ moveUL($('#segSeries')); moveUL($('#segView')); };
+requestAnimationFrame(placeULs); addEventListener('resize', placeULs); document.fonts && document.fonts.ready.then(placeULs);
+
+/* ---- Viewing room (lightbox) ---- */
+const lb = $('#lb'); let lbSet = [], lbI = 0, lastFocus = null;
+function showLB(){ const w = lbSet[lbI];
+  $('#lbImg').src = w.src; $('#lbImg').alt = w.alt; $('#lbNo').textContent = no(w); $('#lbTitle').textContent = w.title;
+  $('#lbPlace').textContent = w.place; $('#lbDate').textContent = fullDate(w.date); $('#lbSeries').textContent = `Room ${seriesOf(w).no} · ${seriesOf(w).title}`;
+  $('#lbNote').textContent = w.note || ''; $('#lbNote').hidden = !w.note; $('#lbCount').textContent = `${pad(lbI+1)} / ${pad(lbSet.length)}`;
+  $('#lbThumbs').querySelectorAll('button').forEach((b,i)=>{ b.setAttribute('aria-current', i===lbI); if(i===lbI) b.scrollIntoView({block:'nearest',inline:'nearest'}); });
+  [lbSet[(lbI+1)%lbSet.length], lbSet[(lbI-1+lbSet.length)%lbSet.length]].forEach(n=>{ const im = new Image(); im.src = n.src; }); }
+function openLB(set, n){ lbSet = set; lbI = Math.max(0, set.findIndex(w=>w.no===n)); lastFocus = document.activeElement;
+  $('#lbThumbs').innerHTML = set.map((w,i)=>`<button type="button" data-i="${i}" aria-label="${no(w)} ${w.title}"><img src="${w.src}" alt=""></button>`).join(''); showLB(); lb.hidden = false; if(window.lenis) lenis.stop(); $('#lbClose').focus();
+  if(hasGSAP && !reduce) gsap.fromTo('#lbImg',{opacity:0,scale:.97,filter:'blur(10px)'},{opacity:1,scale:1,filter:'blur(0px)',duration:1.2,ease:'expo.out'}); }
+function closeLB(){ lb.hidden = true; if(window.lenis) lenis.start(); lastFocus && lastFocus.focus(); }
+function step(d){ lbI = (lbI + d + lbSet.length) % lbSet.length; showLB(); if(hasGSAP && !reduce) gsap.fromTo('#lbImg',{opacity:0,x:Math.sign(d)*24},{opacity:1,x:0,duration:.8,ease:'expo.out'}); }
+const setFor = el => el.dataset.set==='cat' ? visible() : byId(el.dataset.set);
+document.addEventListener('click', e=>{ const f = e.target.closest('[data-no]'); if(!f) return; openLB(setFor(f), +f.dataset.no); });
+document.addEventListener('keydown', e=>{
+  if(!lb.hidden){ if(e.key==='Escape') closeLB(); if(e.key==='ArrowRight') step(1); if(e.key==='ArrowLeft') step(-1); return; }
+  const f = e.target.closest && e.target.closest('[data-no]'); if(f && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); openLB(setFor(f), +f.dataset.no); }
+});
+$('#lbThumbs').addEventListener('click',e=>{ const b = e.target.closest('button'); if(!b) return; const d = +b.dataset.i - lbI; if(d) step(d); });
+(()=>{ let sx=0, sy=0; const st = $('.lb-stage');
+  st.addEventListener('touchstart',e=>{ sx=e.touches[0].clientX; sy=e.touches[0].clientY; },{passive:true});
+  st.addEventListener('touchend',e=>{ const dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy; if(Math.abs(dx)>50 && Math.abs(dx)>Math.abs(dy)) step(dx<0?1:-1); },{passive:true}); })();
+$('#lbClose').onclick = closeLB; $('#lbPrev').onclick = ()=>step(-1); $('#lbNext').onclick = ()=>step(1);
+
+/* ---- Copy email ---- */
+$('#copyMail').addEventListener('click', async e=>{
+  const b = e.currentTarget, addr = $('#mailAddr').textContent;
+  try { await navigator.clipboard.writeText(addr); b.textContent = 'Copied'; }
+  catch(err){ const r = document.createRange(); r.selectNodeContents($('#mailAddr')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = 'Selected — press Ctrl+C'; }
+  setTimeout(()=>b.textContent = 'Copy', 2400);
+});
+
+/* ---- Film grain ---- */
+(()=>{ const c=document.createElement('canvas'); c.width=c.height=160; const x=c.getContext('2d'); const d=x.createImageData(160,160);
+  for(let i=0;i<d.data.length;i+=4){const v=Math.random()*255|0; d.data[i]=d.data[i+1]=d.data[i+2]=v; d.data[i+3]=255;}
+  x.putImageData(d,0,0); $('#grain').style.backgroundImage=`url(${c.toDataURL()})`; })();
+
+/* ---- Mini nav ---- */
+const mini = $('#mini'), prog = $('#progress');
+new IntersectionObserver(([e])=>mini.classList.toggle('show', !e.isIntersecting), {rootMargin:'-80px 0px 0px 0px'}).observe($('.hero'));
+const secs = ['about','rooms','works'].map(id=>document.getElementById(id));
+function onScroll(){
+  const max = document.documentElement.scrollHeight - innerHeight; prog.style.transform = `scaleX(${max>0 ? scrollY/max : 0})`;
+  let cur = null; secs.forEach(s=>{ if (s.getBoundingClientRect().top < innerHeight*.45) cur = s.id; });
+  mini.querySelectorAll('ul a').forEach(a=>a.classList.toggle('cur', a.getAttribute('href')==='#'+cur));
+}
+addEventListener('scroll', onScroll, {passive:true}); onScroll();
+
+/* ---- Sound: music starts with the visitor's first click, tap or key ---- */
+(()=>{
+  const btns = document.querySelectorAll('.snd'); let on = false, touched = false;
+  const MUSIC_SRC = 'music/clair-de-lune.mp3'; /* Debussy — Clair de lune */
+  const audio = Object.assign(new Audio(MUSIC_SRC),{loop:true,volume:0,preload:'auto'});
+  async function setSound(want){
+    on = want;
+    try { if (on) await audio.play(); } catch(e){ on = false; }
+    if (hasGSAP) gsap.to(audio,{volume:on?.7:0,duration:on?2.4:1.4,overwrite:true,onComplete:()=>{ if(!on) audio.pause(); }}); else { audio.volume = on?.7:0; if(!on) audio.pause(); }
+    btns.forEach(b=>{ b.setAttribute('aria-pressed', on); b.querySelector('.snd-t').textContent = on ? 'Sound on' : 'Sound off'; });
+  }
+  btns.forEach(b=>b.addEventListener('click', ()=>{ touched = true; off(); setSound(!on); }));
+  audio.play().then(()=>{ if(!touched){ touched = true; off(); setSound(true); } }).catch(()=>{});
+  const first = e => { if (touched || (e.target.closest && e.target.closest('.snd'))) return; touched = true; off(); setSound(true); };
+  const off = () => ['pointerdown','keydown','touchstart'].forEach(t=>removeEventListener(t,first,true));
+  ['pointerdown','keydown','touchstart'].forEach(t=>addEventListener(t,first,true));
+})();
+
+/* ---- Cursor ---- */
+const cur = $('#cursor');
+if (matchMedia('(hover:hover) and (pointer:fine)').matches){
+  let x=innerWidth/2,y=innerHeight/2,cx=x,cy=y;
+  addEventListener('mousemove',e=>{x=e.clientX;y=e.clientY;cur.style.opacity=1; cur.classList.toggle('on', !!e.target.closest('[data-view]') && lb.hidden);});
+  (function loop(){cx+=(x-cx)*.18;cy+=(y-cy)*.18;cur.style.transform=`translate(${cx}px,${cy}px)`;requestAnimationFrame(loop)})();
+}
+
+/* =========================================================
+   Motion
+   ========================================================= */
+if (hasGSAP && !reduce){
+  gsap.registerPlugin(ScrollTrigger);
+  /* refresh pins without letting the page drift away from where the visitor is */
+  window.safeRefresh = () => { const y = scrollY; ScrollTrigger.refresh(); window.scrollTo(0,y); if (window.lenis){ lenis.resize && lenis.resize(); lenis.scrollTo(y,{immediate:true,force:true}); } };
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  window.scrollTo(0,0);
+
+  if (typeof Lenis !== 'undefined'){
+    window.lenis = new Lenis({duration:1.6, easing:t=>1-Math.pow(1-t,4)});
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add(t=>lenis.raf(t*1000)); gsap.ticker.lagSmoothing(0);
+    document.querySelectorAll('a[href^="#"]:not([data-room])').forEach(a=>a.addEventListener('click',e=>{const t=document.querySelector(a.getAttribute('href')); if(t){e.preventDefault(); lenis.scrollTo(t,{duration:1.8});}}));
+  }
+
+  /* Opening: a horizon in the dark → a slit of recent works → sky and sea part */
+  const loader = document.createElement('div'); loader.className='loader';
+  const glimpses = latest.slice(0,8);
+  loader.innerHTML = `<div class="lid top"></div><div class="lid bot"></div>
+    <div class="slit">${glimpses.map(w=>`<img src="${w.src}" alt="">`).join('')}</div>
+    <div class="horizon"></div>
+    <div class="hz-top"><span class="stamp by">Photographs by Vantyr — ${pad(WORKS.length,3)} works</span><h2 aria-label="Vantyr Archive"><span aria-hidden="true">Vantyr&nbsp;</span><span aria-hidden="true"><em>Archive</em></span></h2></div>
+    <span class="stamp tally" aria-hidden="true"></span>
+    <span class="label skip" aria-hidden="true">Click to skip</span>`;
+  document.body.appendChild(loader);
+  if (window.lenis) lenis.stop();
+  const q = s => loader.querySelector(s), shots = loader.querySelectorAll('.slit img'), tally = q('.tally');
+  const band = () => Math.max(56, innerHeight*.09);
+  let seen = false; try { seen = localStorage.getItem('va-seen') === '1'; localStorage.setItem('va-seen','1'); } catch(e){}
+  const tl = gsap.timeline();
+  if (seen){
+    // returning visitor: the horizon is already there, it opens almost at once
+    gsap.set(q('.horizon'),{scaleX:1}); gsap.set([q('.slit'),tally,q('.skip')],{display:'none'});
+    tl.from(loader.querySelectorAll('h2 span, .by'),{opacity:0,filter:'blur(10px)',duration:.9,stagger:.1,ease:'power2.out'})
+      .to(q('.hz-top'),{opacity:0,filter:'blur(10px)',duration:.6,ease:'power2.in'},'+=.25');
+  } else {
+  tl.to(q('.horizon'),{scaleX:1,duration:2.4,ease:'power3.inOut'})
+    .from(loader.querySelectorAll('h2 span'),{y:26,opacity:0,filter:'blur(14px)',duration:2,stagger:.3,ease:'power2.out'},'-=1.4')
+    .from(q('.by'),{opacity:0,y:8,duration:1.2,ease:'power2.out'},'-=1.5')
+    .to(q('.skip'),{opacity:.7,duration:1},'-=1')
+    .to(q('.slit'),{height:band,duration:1,ease:'expo.inOut'},'+=.2')
+    .to(q('.horizon'),{y:band,duration:1,ease:'expo.inOut'},'<')
+    .to(tally,{opacity:1,duration:.4},'<.5');
+  shots.forEach((img,i)=>tl.add(()=>{ shots.forEach(s=>s.classList.toggle('on',s===img)); tally.textContent = no(glimpses[i]); }, i===0 ? '<' : '+=.2'));
+  tl.to([q('.hz-top'),tally,q('.skip')],{opacity:0,filter:'blur(10px)',duration:.8,ease:'power2.in'},'+=.25')
+    .to(q('.slit'),{opacity:0,duration:.9,ease:'power2.out'},'<.3');
+  }
+  tl.to(q('.lid.top'),{yPercent:-100,duration:2.3,ease:'expo.inOut'},'<')
+    .to(q('.lid.bot'),{yPercent:100,duration:2.3,ease:'expo.inOut'},'<')
+    .to(q('.horizon'),{opacity:0,duration:1.2,ease:'power2.out'},'<.3')
+    .from('.hero .ph img',{scale:1.28,duration:3.4,ease:'expo.out'},'<-.4')
+    .from('.hero .ph',{filter:'blur(16px)',duration:2.8,ease:'power2.out',clearProps:'filter'},'<')
+    .add(()=>{ window.scrollTo(0,0); if (window.lenis){ lenis.scrollTo(0,{immediate:true,force:true}); lenis.start(); } },'<1')
+    .from('.hero-text .line > span',{yPercent:40,opacity:0,filter:'blur(16px)',duration:2.4,stagger:.25,ease:'power2.out'},'-=2')
+    .from('.nav, .hero-foot',{opacity:0,y:-10,duration:1.2,ease:'power2.out'},'-=1.6')
+    .add(()=>{ loader.remove(); safeRefresh(); });
+  loader.addEventListener('click',()=>tl.timeScale(4));
+
+  gsap.to('[data-parallax]',{yPercent:12,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:true}});
+
+  /* Statement */
+  const k = document.querySelector('[data-words]');
+  k.innerHTML = k.textContent.split(' ').map(w=>`<span class="w">${w}</span>`).join(' ');
+  gsap.from(k.querySelectorAll('.w'),{opacity:0,filter:'blur(12px)',y:6,duration:2,stagger:.14,ease:'power3.out',scrollTrigger:{trigger:k,start:'top 82%',once:true}});
+  gsap.from('.intro .label, .intro .sub, .facts > div',{opacity:0,y:14,duration:1.4,stagger:.15,ease:'power3.out',scrollTrigger:{trigger:'.intro',start:'top 78%',once:true}});
+  document.querySelectorAll('.facts b').forEach(b=>{ const n = +b.textContent; const o = {v:0};
+    gsap.to(o,{v:n,duration:2,ease:'power2.out',scrollTrigger:{trigger:b,start:'top 90%',once:true},onUpdate:()=>b.textContent=pad(Math.round(o.v))}); });
+
+  /* Big headings come into focus */
+  document.querySelectorAll('.room-head h2, footer .big').forEach(el=>{
+    gsap.from(el.querySelectorAll('.line > span'),{yPercent:40,opacity:0,filter:'blur(14px)',duration:2.2,stagger:.22,ease:'power2.out',scrollTrigger:{trigger:el,start:'top 85%',once:true}});
+  });
+  gsap.from('.ri-row',{opacity:0,y:30,duration:1.3,stagger:.14,ease:'expo.out',scrollTrigger:{trigger:'.ri-list',start:'top 85%',once:true}});
+
+  /* Room index: floating preview + curtain into the room */
+  const fl = $('#float'), curtain = $('#curtain');
+  document.querySelectorAll('a[data-room]').forEach(a=>{
+    a.addEventListener('mouseenter',()=>{ fl.querySelector('img').src = a.dataset.img; fl.classList.add('on'); });
+    a.addEventListener('mouseleave',()=>fl.classList.remove('on'));
+    a.addEventListener('mousemove',e=>gsap.to(fl,{x:e.clientX,y:e.clientY,duration:.6,ease:'expo.out'}));
+    a.addEventListener('click',e=>{
+      e.preventDefault(); fl.classList.remove('on');
+      const s = SERIES.find(x=>x.id===a.dataset.room), target = document.getElementById('room-'+s.id);
+      $('#curNo').textContent = `Room ${s.no}`; $('#curTitle').innerHTML = `${s.en[0]} <em>${s.en[1]}</em>`;
+      gsap.timeline()
+        .set(curtain,{yPercent:100,visibility:'visible'})
+        .to(curtain,{yPercent:0,duration:.9,ease:'expo.inOut'})
+        .from(curtain.querySelectorAll('.stamp, h3'),{yPercent:60,opacity:0,filter:'blur(10px)',duration:.9,stagger:.08,ease:'expo.out'},'-=.35')
+        .add(()=>{ if (window.lenis) lenis.scrollTo(target,{immediate:true}); else target.scrollIntoView(); })
+        .to(curtain,{yPercent:-100,duration:1.2,ease:'expo.inOut'},'+=.45')
+        .set(curtain,{visibility:'hidden'});
+    });
+  });
+
+  /* Rooms: pinned horizontal walk on wide screens */
+  const mm = gsap.matchMedia();
+  window.roomSTs = [];
+  mm.add('(min-width: 901px)',()=>{
+    document.querySelectorAll('.room').forEach(room=>{
+      const track = room.querySelector('.track'), count = room.querySelector('.count'), bar = room.querySelector('.room-bar i'), n = track.querySelectorAll('.work-card').length;
+      const dist = () => Math.max(0, track.scrollWidth - innerWidth);
+      const tw = gsap.to(track,{x:()=>-dist(),ease:'none',scrollTrigger:{trigger:room,start:'top top',end:()=>'+='+Math.max(innerHeight*.6, dist()),pin:true,scrub:1,invalidateOnRefresh:true,
+        onUpdate:self=>{ count.textContent = `${pad(Math.min(n,1+Math.floor(self.progress*n)))} / ${pad(n)}`; bar.style.transform = `scaleX(${self.progress})`; }}});
+      roomSTs.push({st:tw.scrollTrigger, n});
+    });
+    return ()=>{ roomSTs.length = 0; };
+  });
+  // ← → walk one work at a time inside a pinned room
+  addEventListener('keydown',e=>{
+    if (!lb.hidden || (e.key!=='ArrowRight' && e.key!=='ArrowLeft')) return;
+    const r = roomSTs.find(({st})=>st.isActive); if (!r) return;
+    e.preventDefault();
+    const steps = r.n + 1, i = Math.round(r.st.progress*steps) + (e.key==='ArrowRight'?1:-1);
+    const y = r.st.start + (r.st.end - r.st.start) * gsap.utils.clamp(0,1,i/steps);
+    if (window.lenis) lenis.scrollTo(y,{duration:1.2}); else scrollTo({top:y,behavior:'smooth'});
+  });
+
+  /* Works come into focus as they enter */
+  ScrollTrigger.batch('.work-card, .g-item',{start:'top 88%',once:true,onEnter:els=>{
+    els.forEach((el,i)=>{
+      const f = el.querySelector('.frame'), img = el.querySelector('img'), cap = el.querySelector('figcaption');
+      gsap.fromTo(f,{clipPath:'inset(0 0 100% 0)',filter:'blur(18px)'},{clipPath:'inset(0 0 0% 0)',filter:'blur(0px)',duration:2.2,delay:i*.18,ease:'expo.inOut',clearProps:'filter'});
+      gsap.fromTo(img,{scale:1.18},{scale:1,duration:2.4,delay:i*.18,ease:'expo.out',clearProps:'transform'});
+      gsap.fromTo(cap,{opacity:0,y:10},{opacity:1,y:0,duration:1.2,delay:i*.18+.6,ease:'power3.out'});
+    });
+  }});
+  gsap.from('.g-quote',{opacity:0,y:30,filter:'blur(10px)',duration:1.8,ease:'expo.out',scrollTrigger:{trigger:'.g-quote',start:'top 85%',once:true}});
+
+  /* Marquee speeds up with scroll; catalogue frames lean with velocity */
+  const mq = document.getElementById('mq');
+  ScrollTrigger.create({trigger:'.marquee',start:'top bottom',end:'bottom top',onUpdate:self=>{
+    const v = Math.min(4, 1 + Math.abs(self.getVelocity())/900);
+    mq.getAnimations().forEach(a=>{ a.playbackRate = v; });
+    gsap.to(mq,{skewX:gsap.utils.clamp(-6,6,self.getVelocity()/-400),duration:.4,overwrite:true,onComplete:()=>gsap.to(mq,{skewX:0,duration:.8})});
+  }});
+  const skew = {v:0};
+  ScrollTrigger.create({trigger:'.works',start:'top bottom',end:'bottom top',onUpdate:self=>{
+    const s = gsap.utils.clamp(-3,3,self.getVelocity()/-500);
+    if (Math.abs(s) > Math.abs(skew.v)) { skew.v = s; gsap.to(skew,{v:0,duration:.9,ease:'power3.out',overwrite:true,onUpdate:()=>gsap.set('#catalogue .g-item .frame',{skewY:skew.v})}); }
+  }});
+
+  addEventListener('load',()=>{ if (!document.querySelector('.loader')) safeRefresh(); });
+  document.fonts && document.fonts.ready.then(()=>{ if (!document.querySelector('.loader')) safeRefresh(); });
+}
+</script>
+</body>
+</html>
