@@ -80,3 +80,12 @@ const LARGE = [7,1,13,28,26];               // 화면 가득 크게 거는 작�
 GSAP 3.12.5 + ScrollTrigger (애니메이션), Lenis 1.1.13 (부드러운 스크롤),
 Google Fonts — Cormorant Garamond, Noto Serif KR.
 빌드 과정 없는 HTML 한 장이라, 파일만 바꾸면 바로 반영돼요.
+
+## 영어 버전
+
+사이트 오른쪽 위 `KO / EN` 버튼으로 언어를 바꿔요. 한국어가 아닌 브라우저로 들어오면 처음부터 영어로 보여요.
+작품을 추가할 때 `index.html`의 `const EN = {` 에도 한 줄을 넣으면 영어 화면에도 나와요. 없으면 한국어 그대로 보여요.
+
+```js
+29:['Title','Place','Symbol','One line.','Note (작가 기록 번역, 없으면 빈칸)'],
+```

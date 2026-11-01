@@ -76,10 +76,11 @@ main,footer,.hero{position:relative;z-index:1}
 .loader h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:clamp(36px,5.2vw,68px);line-height:1;letter-spacing:.01em;display:flex;flex-wrap:wrap;justify-content:center}
 .loader h2 span{display:inline-block;white-space:pre}
 .loader .q{position:absolute;left:16px;right:16px;bottom:calc(50% + 30px);margin:0 auto;max-width:30ch;text-align:center;color:var(--ink);font-weight:300;font-size:clamp(20px,2.3vw,30px);line-height:1.7;text-wrap:balance}
-.loader .q span{display:inline-block;white-space:pre}
+.loader .q .w{display:inline-block;white-space:pre}
 .loader .meta{position:absolute;left:16px;right:16px;top:calc(50% + 30px);margin:0;text-align:center;font-family:var(--f-display);font-size:clamp(13px,1.1vw,15px);letter-spacing:.28em;text-transform:uppercase;color:var(--ink-soft);opacity:0}
 .loader .meta i{font-style:normal;opacity:.45;margin:0 .9em}
 @media (max-width:560px){.loader .meta{letter-spacing:.14em;font-size:12px;white-space:nowrap}.loader .meta i{margin:0 .45em}}
+@media (max-width:560px){html[lang="en"] .loader .meta{letter-spacing:.07em;font-size:11.5px}html[lang="en"] .loader .meta i{margin:0 .35em}}
 .loader .meta b{font-weight:400;font-family:var(--f-kr,inherit);letter-spacing:.2em}
 .loader .enter{position:absolute;left:0;right:0;bottom:calc(64px + env(safe-area-inset-bottom,0px));margin:0;display:grid;justify-items:center;gap:14px;text-align:center;opacity:0;cursor:pointer}
 .loader .enter span{font-size:15px;letter-spacing:.24em;color:var(--ink)}
@@ -167,6 +168,15 @@ a.ri-row:hover .t{transform:translateX(10px)}
 .meta{font-size:13px;color:var(--ink-soft);margin-top:4px}
 .meta .no{margin-right:10px}
 /* the artist's own words, signed */
+/* language: both versions are in the page, one is hidden */
+html[lang="ko"] .t-en, html[lang="en"] .t-ko{display:none!important}
+.sym .t-en{font-family:var(--f-display);font-style:italic;font-size:17px;letter-spacing:.04em}
+.lng{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.lng span{opacity:.4;transition:opacity .4s,color .4s}
+.lng i{font-style:normal;opacity:.3}
+html[lang="ko"] .lng [data-l="ko"], html[lang="en"] .lng [data-l="en"]{opacity:1;color:var(--ink)}
+.lng:hover span{opacity:.8}
+.loader .lng{position:absolute;top:calc(22px + env(safe-area-inset-top,0px));right:var(--gutter,24px);z-index:5}
 .anote{margin:14px 0 0;max-width:36ch;font-size:14.5px;line-height:1.9;color:var(--ink-soft);text-wrap:pretty}
 .anote::before{content:"";display:block;width:24px;height:1px;margin:0 auto 16px;background:currentColor;opacity:.35}
 .half .anote{font-size:13.5px}
@@ -279,7 +289,7 @@ footer small{color:var(--ink-soft);font-size:13px}
     <li><a href="#about">About</a></li>
     <li><a href="#rooms">Rooms</a></li>
     <li><a href="#works">Works</a></li>
-  </ul><button class="snd small" type="button" aria-pressed="false" aria-label="배경음악 켜기"><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><span>Sound</span></button></div>
+  </ul><button class="lng small" type="button" aria-label="언어 바꾸기 / Change language"><span data-l="ko">KO</span><i>/</i><span data-l="en">EN</span></button><button class="snd small" type="button" aria-pressed="false" aria-label="배경음악 켜기"><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><span>Sound</span></button></div>
 </div>
 
 <header class="hero" id="top">
@@ -290,7 +300,7 @@ footer small{color:var(--ink-soft);font-size:13px}
       <li><a href="#about">About</a></li>
       <li><a href="#rooms">Rooms</a></li>
       <li><a href="#works">Works</a></li>
-    </ul><button class="snd small" type="button" aria-pressed="false" aria-label="배경음악 켜기"><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><span>Sound</span></button></div>
+    </ul><button class="lng small" type="button" aria-label="언어 바꾸기 / Change language"><span data-l="ko">KO</span><i>/</i><span data-l="en">EN</span></button><button class="snd small" type="button" aria-pressed="false" aria-label="배경음악 켜기"><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><span>Sound</span></button></div>
   </nav>
   <div class="hero-text wrap">
     <h1><span class="line"><span>Light, after</span></span><span class="line"><span><em>the rain.</em></span></span></h1>
@@ -301,8 +311,8 @@ footer small{color:var(--ink-soft);font-size:13px}
 <main>
   <section class="intro wrap" id="about">
     <span class="small">Photographs by Vantyr</span>
-    <p class="k" data-words>머물렀던 자리에 남은 빛을 한 장씩 걸어 둡니다.</p>
-    <p class="sub">사진마다 그것이 품고 있던 한 단어와, 그 앞에서 떠오른 한 문장을 함께 걸었습니다.</p>
+    <p class="k" data-words><span class="t-ko">머물렀던 자리에 남은 빛을 한 장씩 걸어 둡니다.</span><span class="t-en">I hang, one by one, the light that stayed where I once stood.</span></p>
+    <p class="sub"><span class="t-ko">사진마다 그것이 품고 있던 한 단어와, 그 앞에서 떠오른 한 문장을 함께 걸었습니다.</span><span class="t-en">Each photograph hangs with the one word it held, and the one sentence that came to me in front of it.</span></p>
   </section>
 
   <section class="rooms-index wrap" id="rooms" aria-label="전시실">
@@ -314,7 +324,7 @@ footer small{color:var(--ink-soft);font-size:13px}
 
   <section class="works wrap" id="works">
     <div class="works-head">
-      <h2>모든 작품</h2>
+      <h2><span class="t-ko">모든 작품</span><span class="t-en">All Works</span></h2>
       <div class="controls">
         <ul class="seg" id="segSeries" aria-label="전시실 필터"></ul>
         <ul class="seg" id="segView" aria-label="보기 방식"></ul>
@@ -330,7 +340,7 @@ footer small{color:var(--ink-soft);font-size:13px}
     <span class="small">Contact</span>
     <span class="mail"><span id="mailAddr">aha194@naver.com</span><button type="button" class="copy" id="copyMail">Copy</button></span>
   </div>
-  <small>© 2026 Vantyr Archive. 모든 사진은 직접 촬영했습니다.</small>
+  <small>© 2026 Vantyr Archive. <span class="t-ko">모든 사진은 직접 촬영했습니다.</span><span class="t-en">All photographs taken by Vantyr.</span></small>
 </footer>
 
 <div class="aura" aria-hidden="true"><i></i><i></i></div>
@@ -357,14 +367,17 @@ footer small{color:var(--ink-soft);font-size:13px}
    WORKS  : 작품 (sym = 상징하는 단어, line = 한 줄, note = 그때의 기억)
    ========================================================= */
 const SERIES = [
-  {id:'sea',     no:'I',   title:'바다와 바람',   en:'Sea & Wind',      epigraph:'바람을 맞으며, 파도와 같이 있던 오후.', pause:'같은 바다라도, 바람이 다르면 다른 사진이 된다.'},
-  {id:'transit', no:'II',  title:'이동하는 순간', en:'In Transit',      epigraph:'어딘가로 향하는 동안에만 보이는 풍경이 있다.', pause:'비몽사몽한 대합실에서, 설렘이 가득했던 길까지.'},
-  {id:'night',   no:'III', title:'밤의 거리',     en:'After Dark',      epigraph:'불이 꺼진 뒤에야 보이는 길.'},
-  {id:'lines',   no:'IV',  title:'소실점',        en:'Vanishing Point', epigraph:'모든 길은 결국 한 점으로 모인다.'},
-  {id:'weather', no:'V',   title:'날씨',          en:'Weathers',        epigraph:'같은 자리도 날씨가 바뀌면 다른 곳이 된다.', pause:'맑음도 흐림도, 지나가는 동안에만 볼 수 있다.'},
-  {id:'dusk',    no:'VI',  title:'해질녘',        en:'Afterglow',       epigraph:'해가 지는 동안에만, 하늘은 이런 색을 낸다.'},
+  {id:'sea',     no:'I',   title:'바다와 바람',   en:'Sea & Wind',      epigraph:'바람을 맞으며, 파도와 같이 있던 오후.', pause:'같은 바다라도, 바람이 다르면 다른 사진이 된다.',
+     epigraph_en:'An afternoon with the wind in my face, beside the waves.', pause_en:'Even the same sea becomes a different photograph when the wind changes.'},
+  {id:'transit', no:'II',  title:'이동하는 순간', en:'In Transit',      epigraph:'어딘가로 향하는 동안에만 보이는 풍경이 있다.', pause:'비몽사몽한 대합실에서, 설렘이 가득했던 길까지.',
+     epigraph_en:'Some landscapes appear only while you are on your way.', pause_en:'From a half-asleep waiting lounge to a road full of excitement.'},
+  {id:'night',   no:'III', title:'밤의 거리',     en:'After Dark',      epigraph:'불이 꺼진 뒤에야 보이는 길.', epigraph_en:'The road you only see once the lights go out.'},
+  {id:'lines',   no:'IV',  title:'소실점',        en:'Vanishing Point', epigraph:'모든 길은 결국 한 점으로 모인다.', epigraph_en:'Every road gathers, in the end, into a single point.'},
+  {id:'weather', no:'V',   title:'날씨',          en:'Weathers',        epigraph:'같은 자리도 날씨가 바뀌면 다른 곳이 된다.', pause:'맑음도 흐림도, 지나가는 동안에만 볼 수 있다.',
+     epigraph_en:'The same place becomes somewhere else when the weather turns.', pause_en:'Clear or cloudy, you can only see it while it passes.'},
+  {id:'dusk',    no:'VI',  title:'해질녘',        en:'Afterglow',       epigraph:'해가 지는 동안에만, 하늘은 이런 색을 낸다.', epigraph_en:'Only while the sun is setting does the sky make these colors.'},
 ];
-const NEXT_ROOM = {no:'VII', note:'새로 찍은 사진이 모이면 열립니다'};
+const NEXT_ROOM = {no:'VII', note:'새로 찍은 사진이 모이면 열립니다', note_en:'Opens when new photographs gather'};
 /* 전시 리듬: 나란히 걸 두 작품(서로 닮은 사진), 크게 걸 작품 */
 const PAIRS = [[5,9],[2,3],[15,18],[23,24]];
 const LARGE = [7,1,13,28,26];
@@ -399,6 +412,38 @@ const WORKS = [
   {no:28, series:'weather', src:'photos/lenscloud.jpg', hd:true, r:2.257, title:'렌즈구름',           place:'초등학교 운동장', date:'', sym:'정지',     line:'바람이 산을 넘을 때, 구름은 잠시 멈춰 선다.',            note:'', alt:'파란 여름 하늘, 산 위에 길게 걸린 렌즈 모양 구름과 빈 운동장의 축구 골대'},
 ];
 
+/* English version of each work — [title, place, symbol, line, note] (note: 작가 기록의 영어 번역) */
+const EN = {
+  1:['Before Leaving','Airport','Threshold','Leaving always begins first, on the other side of a window.','Half-asleep, sitting blankly in the waiting lounge.'],
+  2:['In Flight','On the plane','Return','To come back means you once left.','The moment it sank in: I was back in Jeju.'],
+  3:['On the Way','On the bus','Anticipation','Something arrives before the arrival — the flutter of the road there.','A road full of excitement.'],
+  4:['Afternoon Show','Jeju','Surprise','The scenes that stay longest come from where you expected nothing.','A show far more fun than I expected.'],
+  5:['Biyangdo in the Afternoon','Hyeopjae, Jeju','Distance','An island made clearer by being out of reach.','That emerald sea was a color I had never seen in my life. All I could do was stare.'],
+  6:['Pinwheels on the Sea','West coast of Jeju','Wind','What we cannot see moves the most.','It felt as if I had stepped into a fantasy. In the strong wind and my friends’ laughter, looking at that view, I felt how truly beautiful nature is.'],
+  7:['What Comes Rolling In','Jeju sea','Repetition','No wave ever returns in the same shape.','Nature is beautiful on ordinary days. But when it rages, it becomes uncontrollably terrifying — that, too, is nature.'],
+  8:['A Day of Low Clouds','Hyeopjae, Jeju','Fairy Tale','There are moments when the real world looks, briefly, like a painting.','Colors like a scene from an animated film — the moment I knew, this is it.'],
+  9:['Hill Facing the Island','Jeju','Stillness','The afternoons when nothing happened are remembered the longest.','How can the lines between land, sea and sky be this clear? An aesthetically perfect place.'],
+  10:['The Sky Home','On the plane','End & Beginning','A sunset is the end of a day, and the beginning of the way home.',''],
+  11:['Walking by the Sea','Seaside','Steps','Before the sea, everyone walks a little slower.',''],
+  12:['200 m Ahead','A night street','Premonition','Even the quietest road has something coming.',''],
+  13:['Fading Lights','Night road','Farewell','What drifts away always leaves a red light behind.',''],
+  14:['Toward the Clouds','On a bridge','Heading','The road ends; the sky goes on.',''],
+  15:['Between Red Pillars','Corridor','Passage','There is always light waiting at the end.',''],
+  16:['Steps Under a Streetlight','Park at night','Alone','The deeper the dark, the more a single light becomes a path.',''],
+  17:['The Blue Bus','Country road','Everyday','What passes by every day becomes, one day, a scene.',''],
+  18:['The Gap','Alley','Gap','Even between wall and wall, a path opens.',''],
+  19:['Red Mailbox','Country village','Waiting','Even at noon, when no one comes, the mailbox waits for someone.',''],
+  20:['Store at Night','Night street','Lingering','Somewhere keeps its lights on at night, so the road feels less lonely.',''],
+  21:['Kite','Sky','Freedom','Because of the string, the kite flies higher.',''],
+  22:['Rainy Fields','Country village','Rain','Rain lowers the voice of a landscape.',''],
+  23:['Sun Beyond the Wires','By the school fence','Setting','Between the wires, the sun slowly lays the day down.',''],
+  24:['After Sunset','By the school fence','Echo','Only after the sun goes down do the far mountains show their outline.',''],
+  25:['Pink Evening','Road below the hills','Tinge','The end of a day is always tinged a little red.',''],
+  26:['Hand of Harmony','Homigot','Reach','The sea can never be held, so the hand stays open.',''],
+  27:['Before the Shower','Elementary school field','Omen','The sky grows heavy first; the rain comes after.',''],
+  28:['Lenticular Cloud','Elementary school field','Pause','When the wind crosses the mountain, the cloud stops for a moment.',''],
+};
+
 document.documentElement.classList.add('js');
 const LQ = {"sunset": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAASABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDShnjlQPHIGU9CDUoYetefRzTW8gMbOjD0rbtNexHtu0Yt/eXv+FYSpvodEKkXudCkgWPJbuf50VjLqVs8C/vMHqR6UU1Bic0cyrs0hJYk+5pzMSMZP50UVsc4i9KKKKBn/9k=", "dusk": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAASABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwCCZvKk2bc+9TQwtLGH2Yz0qhJqlvIiMgKEA/KRnGfetC21uyjxvVixGCVXAFX7Z9ifZogvFa3jZtjHA7DOaKsXGs2EqEEP/wB8mil7ZsfIjjl6Ufwn60UVIACfU0UUUwP/2Q==", "pinksky": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAAYABIDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwBgibHeniE46ViWOsywyBpS0g7g1tPrmlXVrLFOkyFlIHy557dKvnZXLBrUTYv95fzFFcqVbJoqudmfLEcnlDO5SR9cU/fAV27DknjHB/OiioGP2KON3Siiii4z/9k=", "storm": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAAYABIDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwCv5bH5QCTUqWUjnAUk+gq3Jr8Nrbwyxwxr52COP4e9aJ1e1WFZTcxAN0A5J9qfMHKZY0m6x/qT+dFOPi63DEASEf7tFHMwsjj5fMdgX2j6DFNkdmzuIGeoAoopBYYI2I7UUUVQj//Z", "hand": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAAYABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDqOKTAqj9uX+8PzqIarEZTHuwQcc09Q0NIgUVnm/T++v50UWYaGdHG4++yZz2U1UjGdYmTgERg52/SiincLFkwuCMOnXnKf/XooopXCx//2Q==", "lenscloud": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAALABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwCxJqkDxf8AHw0nqqRnJ/Os9pIHkwpnGe7QnH86d5j/AN4/nSrI/wDePNHtpIPZoi6fMitJxnAUjP5iirKu3rRSdeQ/ZI//2Q==", "mailbox": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAASABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDJnmN/du0EAbcMHBywxVWN3jB8vKknIJOMU+3ZoZkeP7wbIxxk10lpp8NwN0ykGNsKQBzkZP61jc6qtLkSYWOt2djZpEqSSv1crgDP50U46TsYlDGc9eNuR+VFPnktEjn5LnLp94fWu2tAP7PjOOSMk+tFFSd2I6Eg6UUUUzlP/9k=", "store": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAASABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDk7mAW33POQn++MU+HS7mRof3b4mGVOxjx+XNQXFzLMwMz5IqeHUJY3R1lcFBtX5icCp1sBDqdqlndGFJC+AMkqVwfTBopt5IJTvwSxPLE5zRVoRCaWiikA16KKKYH/9k=", "kite": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAASABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwC9GuBUyrTUFSiu5nIGKKXpk0UgIYulTCiimwGyfdooooQH/9k=", "rainfield": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAASABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwCiuuk6u935CsD91HOQvvXRQ+JbRkXzdwfHO1eK5eOxtJLhQzNGT2DDB+nFaf8AZaRoAkzf8Cwf1rbkbM20bI8Q2JOCzL9VornLq1uhEYo44pIz74OfrRScX2J+Zjkk2qZOeK2dGd3sxuZm57nNFFaQ3CRaYnJ5ooorUk//2Q==", "beachwalk": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAAYABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwBioKnRBWQL2b1H5VIt7P8A3x+QrfmMbG7EgorFW/uA6LvPzkjIA9KKXMOw8AJ93g+wH+FOEjqMgkD1AA/pRRXJdnTZEbIXw3mMSDkfN0oooouFj//Z", "schoolzone": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAAYABIDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDmtn+jb85bIAGasxXLyTBJVU7RgbRjpxUsVmNys7bgBjDUlxHFCuR9/wBRml6gQmTJJzRSBAQDzzRRcLGvEOBvKew7026s/OKlmXkDgdhRRWcXfUtoaIGUBQeBx0oooqrCP//Z", "taillights": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAASABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDhQO1Bpynac4B+tKz7hyoz60xEdFLRQAUUUUAHaiiigD//2Q==", "bridge": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAAYABIDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwCvijFWre9ijOHjyvpmm3EsDAtGAPUelac5hylfFFOyvr+lFPmDlKX3cZYcegH86EGFwp596KKxNhfNlH/LM/hmiiipuOx//9k=", "corridor": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAAWABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDmJ4tpPAz3461BtPoPyroLmO2kBCkhuc/XJ/8ArUDRIv7J+2GU7/M2be2KzUjedHW6MaGEkcDBPXHHFFbdrHaxL+9G4bWH4kDH60VN2zX2fLoV5isUSEL8xHJ9cEimfbZPsflZ+XfuxRRW7SOdtsdbotwdrZACs3HqBkUUUVLRtBtn/9k=", "parklamp": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAAYABIDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDh2XFNIIODwatNazSOSiZBOBikltbgsXdOvcmi6EV9tFWBG2B8tFFwNpWijOUgKn1DEUkkiSffiZvq5ooqbFIixF/zwP8A30aKKKkvlP/Z", "bluebus": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAASABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwCSW5kITiNlztIVqi1G9EZUNEyoeeCOKjWyLEEkLT5NOLgbXU4/vrkVmnrqaNaaDYb0AERGVfXPTH1oqa2tJYv9bJEV/uhSAaKcmr6CSfUni5cZqReWooqHuWNbvRRRTA//2Q==", "alley": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAASABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwCzaWcbR4YAqHJwOnWor/X5bTOn2yYkPyB8/dBPUe/NW7CVGhYhhjcevFczqkjDWZpFGYxIDkfQVkmXYkktGKMoc7ifvHk0VdMkRXdu/KiouzWyAKo6AD8KCADwKKK0IGetFFFSM//Z", "island": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAAYABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDXk0tsZAqu+mOO1NbxWQgJjiHGfvVWl8VOy4URqWHBAziujnZzciJ205x2oqiniK4AYl1k4+6UxRQ6ttw5LkAu9OHRY/wSgajYjpj/AL5oorzfZrudPMxwvbGQYyn0IoooqXBIfMf/2Q==", "flight": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAAYABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDiLfaJgz/dHNbGkWplSScj7zYFYgOK37G9a2tI41wMDNDv0BWZbmtxBbyTOPlQZorL1XVZbmL7PuG3OWxRQr9QaXQyKkMrY+8fzoopiIyc0UUUwP/Z", "hyeopjae": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAAYABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDQhtY4gHYLIf7tWQtt98wbXXoAOKnRQB90H60rAEcKB9BTcr7k2sUp5mb7qAD0oqzIRswVXnoRRRePYNe5irGzqN11OPo5pZIZApK3kq+uaKKxNTKuJCjf8hH7vQZoooq7En//2Q==", "biyangdo": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAAYABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDR4o4qjNdXJAMMKhR1LnrVc3Oo7wf3ePTsa0uZaGtxRVSO8JX95Ed3ohzmii4aD1cdowKMsR/9eiisbmthOev9aKKKLhY//9k=", "turbines": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAAYABIDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDQ2ijaKKWtbmVg8sUUZoouwsjLTVRKD5eP+BDFKdTK4BMeT2HNFFIdhn9rn+6v60UUUBY//9k=", "waves": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAASABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwB1qqgc1d2oVrMtzHsw0rE/9c/8DVnzghO0qw7blYY/WtroyaYXSKckKBRVS5kbcT5qj2w2P50Um0UrlW36CrXaiioGVbgnB5NFFFBR/9k=", "airport": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAAYABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwCC3s1kd+OlT/YFLJlf4yP0NSWEFw00u1UJGOshHr7VNdNcWcYmmjTYshHyuSc4PtV86M+Rleewt1s5pNpyucc0VVuNTV4ZIyDl89/WilcqzM+PWY4XY/vB9DRca5DNF5Z8wc55OaKKLhYri5ikXKuPoeKKKKko/9k=", "cabin": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAAYABIDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwCTTbcLdLu/i4ov5IY3kJIHzetLqS3UcafYgplLDBzjaPWsQ2043Q3MO8lvMLq2cn0qriJDMCSQy/nRWcbG5YkiCTB5FFFx2L0ek3MnI8kf7xp76LcgZMtsKKKVwsVjplxn/Xw/maKKKQ7H/9k=", "bus": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAAYABIDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwCtYW3l24LgHcxC+5Harn2FDH5sgAVRlgDWLDqsLJtulKsjZVlGcjuCKnlm1ecJ5Zhji4OMrjnoTmquFiYxqxyp4PI+U/4UVntqN6rFWYswOCQowaKdxHQW9ppcb+YlqgYDrkmluobGRCTERxyVYjHtRRWZZQ+yWnZZMf8AXQ0UUUxH/9k=", "show": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAAYABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwCOHUVAXdApPfDYp0uqjcBbwqPduaaljBF94oQCASzHqe2KuNp53IgjjHmD5Tt4P144o5hamfNqzsu0xRZx6Gipm0rcXIaPCtg9etFK5STKWha5NLeJb3W1g/3WxyDW3eXtxbySzJmSMKuEA5znmiigCNZ18qRw2FkbcBjGKKKKBn//2Q=="};
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -410,7 +455,17 @@ const seriesOf = w => SERIES.find(s=>s.id===w.series);
 const byId = id => WORKS.filter(w=>w.series===id).sort((a,b)=>a.no-b.no);
 const latest = [...WORKS].sort((a,b)=>b.no-a.no);
 const featured = WORKS.find(w=>w.featured) || latest[0];
-const metaLine = w => [w.place, w.date].filter(Boolean).join(' · ');
+/* ---- Language: both versions are written into the page; CSS shows one ---- */
+let LANG = 'ko';
+try { LANG = localStorage.getItem('va-lang') || ((navigator.language||'ko').toLowerCase().startsWith('ko') ? 'ko' : 'en'); } catch(e){}
+document.documentElement.lang = LANG;
+const bi = (ko, en) => en ? `<span class="t-ko">${ko}</span><span class="t-en">${en}</span>` : ko;
+const E = w => { const e = EN[w.no] || []; return {title:e[0], place:e[1], sym:e[2], line:e[3], note:e[4]}; };
+const T = { title:w=>bi(w.title,E(w).title), line:w=>bi(w.line,E(w).line),
+  sym:w=>bi(`「${w.sym}」`, E(w).sym), note:w=>bi(w.note, E(w).note),
+  room:s=>bi(s.title,s.en), roomSub:s=>bi(s.en,s.title) };
+const metaLine = w => { const ko=[w.place,w.date].filter(Boolean).join(' · '), en=[E(w).place||w.place,w.date].filter(Boolean).join(' · '); return ko ? bi(ko,en) : ''; };
+const SIG = '<span class="sig">— Vantyr</span>';
 /* hd:true 작품은 photos/이름-1200.webp, 이름-2400.webp 를 화면 크기에 맞춰 불러와요 */
 const base = w => w.src.replace(/\.jpg$/,'');
 const img = (w, sizes) => w.hd ? `src="${base(w)}-1200.webp" srcset="${base(w)}-1200.webp 1200w, ${base(w)}-2400.webp 2400w" sizes="${sizes}"` : `src="${w.src}"`;
@@ -428,14 +483,14 @@ function hydrate(root){
 /* ---- Hero ---- */
 if (featured.hd){ $('#heroImg').srcset = `${base(featured)}-1200.webp 1200w, ${base(featured)}-2400.webp 2400w`; $('#heroImg').sizes = '100vw'; }
 $('#heroImg').src = featured.hd ? `${base(featured)}-2400.webp` : featured.src; $('#heroImg').alt = featured.alt;
-$('#heroFoot').innerHTML = `<b>${featured.title}</b><span>「${featured.sym}」 ${featured.line}</span>`;
+$('#heroFoot').innerHTML = `<b>${T.title(featured)}</b><span>${T.sym(featured)} ${T.line(featured)}</span>`;
 
 /* ---- Rooms index ---- */
-$('#riList').innerHTML = SERIES.map(s=>`<li><a class="ri-row" href="#room-${s.id}"><span class="no">${s.no}.</span><span class="t">${s.title}<em>${s.en}</em></span><span class="m">${byId(s.id).length}점</span></a></li>`).join('')
-  + `<li><div class="ri-row soon"><span class="no">${NEXT_ROOM.no}.</span><span class="t">다음 전시실</span><span class="m">${NEXT_ROOM.note}</span></div></li>`;
+$('#riList').innerHTML = SERIES.map(s=>`<li><a class="ri-row" href="#room-${s.id}"><span class="no">${s.no}.</span><span class="t">${T.room(s)}<em>${T.roomSub(s)}</em></span><span class="m">${bi(byId(s.id).length+'점', byId(s.id).length+(byId(s.id).length===1?' work':' works'))}</span></a></li>`).join('')
+  + `<li><div class="ri-row soon"><span class="no">${NEXT_ROOM.no}.</span><span class="t">${bi('다음 전시실','Next room')}</span><span class="m">${bi(NEXT_ROOM.note,NEXT_ROOM.note_en)}</span></div></li>`;
 
 /* ---- Rooms ---- */
-const captionHTML = w => `<figcaption class="caption"><span class="sym">「${w.sym}」</span><p class="verse">${w.line}</p><span class="meta"><span class="no">${no(w)}</span>${w.title}${metaLine(w) ? ' · ' + metaLine(w) : ''}</span>${w.note ? `<p class="anote">${w.note}<span class="sig">— Vantyr</span></p>` : ''}</figcaption>`;
+const captionHTML = w => `<figcaption class="caption"><span class="sym">${T.sym(w)}</span><p class="verse">${T.line(w)}</p><span class="meta"><span class="no">${no(w)}</span>${T.title(w)}${metaLine(w) ? ' · ' + metaLine(w) : ''}</span>${w.note ? `<p class="anote">${T.note(w)}${SIG}</p>` : ''}</figcaption>`;
 const pieceHTML = w => { const big = LARGE.includes(w.no);
   return `<figure class="piece${big ? ' large' : ''}" data-no="${w.no}" data-set="${w.series}">
   <div class="frame" style="--r:${w.r}" data-view><img ${img(w, big ? '(max-width:900px) 92vw, 80vw' : '(max-width:900px) 92vw, 60vw')} alt="${w.alt}" loading="lazy"></div>
@@ -449,33 +504,33 @@ function roomUnits(s){
   ws.forEach(w=>{ if (used.has(w.no)) return;
     const pr = PAIRS.find(p=>p[0]===w.no || p[1]===w.no), mate = pr && ws.find(x=>x.no===(pr[0]===w.no ? pr[1] : pr[0]));
     if (mate){ used.add(w.no); used.add(mate.no); units.push(pairHTML(w, mate)); } else { used.add(w.no); units.push(pieceHTML(w)); } });
-  if (s.pause && units.length >= 4) units.splice(Math.floor(units.length/2), 0, `<div class="pause wrap"><p>${s.pause}</p></div>`);
+  if (s.pause && units.length >= 4) units.splice(Math.floor(units.length/2), 0, `<div class="pause wrap"><p>${bi(s.pause,s.pause_en)}</p></div>`);
   return units.join('');
 }
 $('#roomsWrap').innerHTML = SERIES.map((s,i)=>{ const nx = SERIES[i+1];
   return `<section class="room" id="room-${s.id}" aria-label="${s.title}">
-    <div class="room-open wrap"><span class="small">Room ${s.no}</span><h2>${s.title}<em>${s.en}</em></h2><blockquote>${s.epigraph}</blockquote></div>
+    <div class="room-open wrap"><span class="small">Room ${s.no}</span><h2>${T.room(s)}<em>${T.roomSub(s)}</em></h2><blockquote>${bi(s.epigraph,s.epigraph_en)}</blockquote></div>
     ${roomUnits(s)}
-    <div class="room-exit wrap">${nx ? `<a href="#room-${nx.id}"><span class="small">Next room</span><b>${nx.title}</b></a>` : `<a href="#works"><span class="small">Exit</span><b>모든 작품 보기</b></a>`}</div>
+    <div class="room-exit wrap">${nx ? `<a href="#room-${nx.id}"><span class="small">Next room</span><b>${T.room(nx)}</b></a>` : `<a href="#works"><span class="small">Exit</span><b>${bi('모든 작품 보기','View all works')}</b></a>`}</div>
   </section>`; }).join('');
 hydrate($('#roomsWrap'));
 
 /* ---- Catalogue ---- */
 let curSeries = 'all', curView = 'grid';
-$('#segSeries').innerHTML = [['all','전체'],...SERIES.map(s=>[s.id,s.title])].map(([id,t])=>`<li><button type="button" data-v="${id}" aria-pressed="${id===curSeries}">${t}</button></li>`).join('');
-$('#segView').innerHTML = [['grid','갤러리'],['list','목록']].map(([id,t])=>`<li><button type="button" data-v="${id}" aria-pressed="${id===curView}">${t}</button></li>`).join('');
+$('#segSeries').innerHTML = [['all',bi('전체','All')],...SERIES.map(s=>[s.id,T.room(s)])].map(([id,t])=>`<li><button type="button" data-v="${id}" aria-pressed="${id===curSeries}">${t}</button></li>`).join('');
+$('#segView').innerHTML = [['grid',bi('갤러리','Gallery')],['list',bi('목록','List')]].map(([id,t])=>`<li><button type="button" data-v="${id}" aria-pressed="${id===curView}">${t}</button></li>`).join('');
 const visible = () => (curSeries==='all' ? WORKS : byId(curSeries)).slice().sort((a,b)=>a.no-b.no);
 function renderCatalogue(){
   const list = visible(), el = $('#catalogue');
-  if (!list.length){ el.className='grid'; el.innerHTML = `<div class="empty">아직 걸린 작품이 없어요.</div>`; return; }
+  if (!list.length){ el.className='grid'; el.innerHTML = `<div class="empty">${bi('아직 걸린 작품이 없어요.','No works here yet.')}</div>`; return; }
   if (curView==='list'){
     el.className = 'list';
-    el.innerHTML = list.map(w=>`<div class="l-row" role="button" tabindex="0" data-no="${w.no}" data-set="cat" aria-label="${w.title} 크게 보기"><span class="no">${no(w)}</span><div class="th"><img src="${small(w)}" alt="" loading="lazy"></div><b>${w.title}</b><span class="s">「${w.sym}」</span><span class="v">${w.line}</span></div>`).join('');
+    el.innerHTML = list.map(w=>`<div class="l-row" role="button" tabindex="0" data-no="${w.no}" data-set="cat" aria-label="${w.title} 크게 보기"><span class="no">${no(w)}</span><div class="th"><img src="${small(w)}" alt="" loading="lazy"></div><b>${T.title(w)}</b><span class="s">${T.sym(w)}</span><span class="v">${T.line(w)}</span></div>`).join('');
   } else {
     el.className = 'grid';
     let nP = 0, nL = 0;
     const slot = w => w.r < .9 ? ['g-b','g-d'][nP++ % 2] : w.r > 1.6 ? 'g-c' : ['g-a','g-e'][nL++ % 2];  /* portrait → narrow, landscape → wide */
-    el.innerHTML = list.map(w=>`<figure class="g-item ${slot(w)}" style="--r:${w.r}" data-no="${w.no}" data-set="cat" tabindex="0" role="button" aria-label="${w.title} 크게 보기"><div class="frame"><img ${img(w,'(max-width:900px) 92vw, 50vw')} alt="${w.alt}" loading="lazy"></div><figcaption><span class="no">${no(w)}</span><b>${w.title}</b><span class="s">「${w.sym}」</span></figcaption></figure>`).join('');
+    el.innerHTML = list.map(w=>`<figure class="g-item ${slot(w)}" style="--r:${w.r}" data-no="${w.no}" data-set="cat" tabindex="0" role="button" aria-label="${w.title} 크게 보기"><div class="frame"><img ${img(w,'(max-width:900px) 92vw, 50vw')} alt="${w.alt}" loading="lazy"></div><figcaption><span class="no">${no(w)}</span><b>${T.title(w)}</b><span class="s">${T.sym(w)}</span></figcaption></figure>`).join('');
   }
   hydrate(el);
 }
@@ -493,9 +548,9 @@ renderCatalogue();
 /* ---- Viewing room ---- */
 const lb = $('#lb'); let lbSet = [], lbI = 0, lastFocus = null;
 function showLB(){ const w = lbSet[lbI], s = seriesOf(w);
-  $('#lbImg').src = full(w); $('#lbImg').alt = w.alt; $('#lbSym').textContent = `「${w.sym}」`; $('#lbVerse').textContent = w.line;
-  $('#lbNo').textContent = no(w); $('#lbTitle').textContent = w.title; $('#lbPlace').textContent = metaLine(w); $('#lbSeries').textContent = `Room ${s.no} · ${s.title}`;
-  const nt = $('#lbNote'); nt.textContent = w.note || ''; if (w.note) nt.append(Object.assign(document.createElement('span'),{className:'sig',textContent:'— Vantyr'})); nt.hidden = !w.note; $('#lbCount').textContent = `${pad(lbI+1)} / ${pad(lbSet.length)}`;
+  $('#lbImg').src = full(w); $('#lbImg').alt = w.alt; $('#lbSym').innerHTML = T.sym(w); $('#lbVerse').innerHTML = T.line(w);
+  $('#lbNo').textContent = no(w); $('#lbTitle').innerHTML = T.title(w); $('#lbPlace').innerHTML = metaLine(w); $('#lbSeries').innerHTML = `Room ${s.no} · ${T.room(s)}`;
+  const nt = $('#lbNote'); nt.innerHTML = w.note ? T.note(w) + SIG : ''; nt.hidden = !w.note; $('#lbCount').textContent = `${pad(lbI+1)} / ${pad(lbSet.length)}`;
   $('#lbThumbs').querySelectorAll('button').forEach((b,i)=>{ b.setAttribute('aria-current', i===lbI); if(i===lbI) b.scrollIntoView({block:'nearest',inline:'nearest'}); });
   [lbSet[(lbI+1)%lbSet.length], lbSet[(lbI-1+lbSet.length)%lbSet.length]].forEach(n=>{ const im = new Image(); im.src = full(n); }); }
 function openLB(set, n){ lbSet = set; lbI = Math.max(0, set.findIndex(w=>w.no===n)); lastFocus = document.activeElement;
@@ -515,6 +570,12 @@ $('#lbThumbs').addEventListener('click',e=>{ const b = e.target.closest('button'
   st.addEventListener('touchstart',e=>{ sx=e.touches[0].clientX; sy=e.touches[0].clientY; },{passive:true});
   st.addEventListener('touchend',e=>{ const dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy; if(Math.abs(dx)>50 && Math.abs(dx)>Math.abs(dy)) step(dx<0?1:-1); },{passive:true}); })();
 $('#lbClose').onclick = closeLB; $('#lbPrev').onclick = ()=>step(-1); $('#lbNext').onclick = ()=>step(1);
+
+/* ---- Language toggle ---- */
+document.addEventListener('click', e=>{ const b = e.target.closest('.lng'); if (!b) return; e.preventDefault();
+  LANG = LANG === 'ko' ? 'en' : 'ko'; document.documentElement.lang = LANG;
+  try { localStorage.setItem('va-lang', LANG); } catch(err){}
+  window.safeRefresh && setTimeout(safeRefresh, 50); });
 
 /* ---- Copy email ---- */
 $('#copyMail').addEventListener('click', async e=>{
@@ -552,7 +613,7 @@ addEventListener('scroll', ()=>{ let cur = null; secs.forEach(s=>{ if (s.getBoun
   /* 들어오는 순간 재생을 시도해요. 브라우저가 막으면 오프닝 끝에서 한 번의 클릭으로 시작돼요 */
   window.autoplay = 'pending';
   audio.play().then(()=>{ window.autoplay = 'ok'; if(!touched){ touched = true; off(); setSound(true, 9); } }).catch(()=>{ window.autoplay = 'blocked'; });
-  const first = e => { if (touched || (e.target.closest && e.target.closest('.snd'))) return; touched = true; off(); setSound(true, document.querySelector('.loader') ? 7 : 3); };
+  const first = e => { if (touched || (e.target.closest && e.target.closest('.snd, .lng'))) return; touched = true; off(); setSound(true, document.querySelector('.loader') ? 7 : 3); };
   const off = () => ['pointerdown','keydown','touchstart'].forEach(t=>removeEventListener(t,first,true));
   ['pointerdown','keydown','touchstart'].forEach(t=>addEventListener(t,first,true));
 })();
@@ -581,9 +642,10 @@ if (hasGSAP && !reduce){
   loader.innerHTML = `<div class="reel"><img src="${featured.hd ? base(featured)+'-2400.webp' : featured.src}" alt="" decoding="async"></div>
     <div class="lid top"></div><div class="lid bot"></div><div class="horizon"></div>
     <div class="hz"><h2 aria-label="Vantyr Archive"><span aria-hidden="true">Vantyr&nbsp;</span><span aria-hidden="true"><em>Archive</em></span></h2></div>
-    <p class="q" aria-label="${featured.line}">${featured.line.split(' ').map((w,i,a)=>`<span aria-hidden="true">${w}${i<a.length-1?' ':''}</span>`).join('')}</p>
-    <p class="meta"><b>사진전</b><i>·</i>${WORKS.length} works<i>·</i>${SERIES.length} rooms<i>·</i>${since} —</p>
-    <p class="enter" role="button" tabindex="0"><span>들어가기</span></p>`;
+    <p class="q">${(()=>{ const words = t => t.split(' ').map((w,i,a)=>`<span class="w">${w}${i<a.length-1?' ':''}</span>`).join(''); return bi(words(featured.line), E(featured).line && words(E(featured).line)); })()}</p>
+    <button class="lng small" type="button" aria-label="언어 바꾸기 / Change language"><span data-l="ko">KO</span><i>/</i><span data-l="en">EN</span></button>
+    <p class="meta"><b>${bi('사진전','Photographs')}</b><i>·</i>${WORKS.length} works<i>·</i>${SERIES.length} rooms<i>·</i>${since} —</p>
+    <p class="enter" role="button" tabindex="0"><span>${bi('들어가기','Enter')}</span></p>`;
   document.body.appendChild(loader);
   if (window.lenis) lenis.stop();
   const q = s => loader.querySelector(s);
@@ -613,7 +675,7 @@ if (hasGSAP && !reduce){
   }
   // entering: the title card leaves, one sentence surfaces word by word,
   // then the horizon opens — first into a narrow strip of the featured work, then the whole of it
-  const words = loader.querySelectorAll('.q span');
+  const words = loader.querySelectorAll('.q .w');
   gsap.set(words,{opacity:0,y:10,filter:'blur(10px)'});
   tl.add(()=>{ breath && breath.kill(); pulse.forEach(t=>t.kill()); })
     .to([q('.hz'),q('.meta'),q('.enter')],{opacity:0,filter:'blur(10px)',duration:.8,ease:'power2.in'},'+=.2')
@@ -634,7 +696,7 @@ if (hasGSAP && !reduce){
     .from('.hero-text .line > span',{yPercent:30,opacity:0,filter:'blur(16px)',duration:2.6,stagger:.3,ease:'power2.out'},'-=2.2')
     .from('.nav, .hero-foot',{opacity:0,duration:1.6,ease:'power2.out'},'-=1.6')
     .add(()=>{ loader.remove(); safeRefresh(); });
-  loader.addEventListener('click',()=>{
+  loader.addEventListener('click',e=>{ if (e.target.closest('.lng')) return;
     if (waiting){ waiting = false; loader.classList.remove('gate'); pulse.forEach(t=>t.kill()); tl.play(); }
     else if (!tl.paused()) tl.timeScale(3);
   });
@@ -644,7 +706,7 @@ if (hasGSAP && !reduce){
 
   /* Statement words come into focus */
   const k = document.querySelector('[data-words]');
-  k.innerHTML = k.textContent.split(' ').map(w=>`<span class="w">${w}</span>`).join(' ');
+  k.querySelectorAll('.t-ko, .t-en').forEach(sp=>sp.innerHTML = sp.textContent.split(' ').map(w=>`<span class="w">${w}</span>`).join(' '));
   gsap.from(k.querySelectorAll('.w'),{opacity:0,filter:'blur(12px)',duration:2.2,stagger:.16,ease:'power2.out',scrollTrigger:{trigger:k,start:'top 80%',once:true}});
   gsap.from('.intro .small, .intro .sub',{opacity:0,duration:2,stagger:.3,ease:'power2.out',scrollTrigger:{trigger:'.intro',start:'top 75%',once:true}});
   gsap.from('.ri-row',{opacity:0,duration:1.6,stagger:.15,ease:'power2.out',scrollTrigger:{trigger:'.ri-list',start:'top 85%',once:true}});
