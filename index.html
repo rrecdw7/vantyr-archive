@@ -202,6 +202,8 @@ a.ri-row:hover .t em{color:var(--sky-ink)}
 .g-c{grid-column:1 / -1} .g-c .frame{aspect-ratio:21/9}
 .g-d{grid-column:3 / span 4} .g-d .frame{aspect-ratio:3/4}
 .g-e{grid-column:8 / span 5} .g-e .frame{aspect-ratio:4/3}
+.grid .g-item .frame{aspect-ratio:var(--r,1)}
+.grid .g-item .frame img{object-fit:contain}
 .g-quote{grid-column:2 / span 9;margin:clamp(8px,2vw,24px) 0;font-family:var(--f-kserif);font-weight:300;font-size:clamp(28px,3.8vw,52px);line-height:1.45;letter-spacing:-.02em;text-wrap:balance}
 .g-quote b{font-weight:300;color:var(--sky-ink)}
 .g-quote .q-by{display:block;margin-top:22px}
@@ -241,8 +243,8 @@ footer .big em{font-style:italic}
 .lb-top{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center}
 .lb button{all:unset;cursor:pointer;padding:8px 2px}
 .lb button:focus-visible{outline:2px solid var(--sky);outline-offset:3px}
-.lb-stage{min-height:0;display:grid;place-items:center;padding-block:20px}
-.lb-stage img{max-height:100%;max-width:100%;object-fit:contain;width:auto;height:auto}
+.lb-stage{min-height:0;position:relative;margin-block:20px}
+.lb-stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
 .lb-label{align-self:end;padding-bottom:20px;display:grid;gap:10px;border-left:1px solid var(--line);padding-left:24px}
 .lb-label h3{margin:0;font-family:var(--f-kserif);font-weight:300;font-size:26px;line-height:1.35}
 .lb-label dl{margin:8px 0 0;display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-size:13px}
@@ -510,7 +512,9 @@ function renderCatalogue(){
     el.innerHTML = list.map(w=>`<div class="l-row" role="button" tabindex="0" data-view data-no="${w.no}" data-set="cat" aria-label="${w.title} 크게 보기"><span class="stamp c-no">${no(w)}</span><div class="frame th"><img src="${w.src}" alt="" loading="lazy"></div><b>${w.title}</b><span class="c-place">${w.place}</span><span class="c-series">${seriesOf(w).title}</span><span class="stamp">${stamp(w.date)}</span></div>`).join('');
   } else {
     el.className = 'grid';
-    const items = list.map((w,i)=>`<figure class="g-item ${layout[i%layout.length]}" data-view data-no="${w.no}" data-set="cat" tabindex="0" role="button" aria-label="${w.title} 크게 보기"><div class="frame"><img src="${w.src}" alt="${w.alt}" loading="lazy"></div>${labelCard(w)}</figure>`);
+    let nP = 0, nL = 0;
+    const slot = w => w.r < .9 ? ['g-b','g-d'][nP++ % 2] : w.r > 1.6 ? 'g-c' : ['g-a','g-e'][nL++ % 2];  /* portrait → narrow column, landscape → wide */
+    const items = list.map((w,i)=>`<figure class="g-item ${slot(w)}" style="--r:${w.r}" data-view data-no="${w.no}" data-set="cat" tabindex="0" role="button" aria-label="${w.title} 크게 보기"><div class="frame"><img src="${w.src}" alt="${w.alt}" loading="lazy"></div>${labelCard(w)}</figure>`);
     const qw = WORKS.find(w=>w.no===QUOTE.from);
     if (curSeries==='all' && items.length>=3 && qw) items.splice(2,0,`<blockquote class="g-quote">${QUOTE.text}<span class="stamp q-by">— ${no(qw)} ${qw.title}</span></blockquote>`);
     el.innerHTML = items.join('');
