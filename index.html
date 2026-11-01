@@ -139,7 +139,14 @@ main,footer,.hero{position:relative;z-index:1}
 .intro p.sub{margin:0;color:var(--ink-soft);max-width:34ch;font-size:15px}
 
 /* ---------- Rooms index: a quiet list ---------- */
-.rooms-index{padding-block:0 clamp(120px,16vw,200px);display:grid;justify-items:center}
+.rooms-index{padding-block:0 clamp(120px,16vw,200px);display:grid;justify-items:center;position:relative;isolation:isolate}
+/* the room you point at glows faintly behind the list */
+.ri-bg{position:absolute;z-index:-1;left:50%;width:100vw;transform:translateX(-50%);top:-12vh;bottom:2vh;pointer-events:none;
+  -webkit-mask-image:radial-gradient(ellipse 62% 58% at 50% 46%,#000 28%,transparent 78%);mask-image:radial-gradient(ellipse 62% 58% at 50% 46%,#000 28%,transparent 78%)}
+.ri-bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.08);filter:blur(2px) saturate(.9) brightness(.62);transition:opacity 1.4s var(--ease),transform 3.2s var(--ease)}
+.ri-bg img.on{opacity:.6;transform:scale(1)}
+.ri-row > *{transition:opacity .7s var(--ease)}
+.ri-list.hovering .ri-row:not(.act) > *{opacity:.3}
 .rooms-index>.small{margin-bottom:28px}
 .ri-list{list-style:none;margin:0;padding:0;width:min(760px,100%)}
 .ri-row{display:grid;grid-template-columns:72px minmax(0,1fr) auto;align-items:baseline;gap:20px;padding-block:22px;border-top:1px solid var(--line);text-decoration:none}
@@ -525,6 +532,28 @@ $('#heroFoot').innerHTML = `<b>${T.title(featured)}</b><span>${T.sym(featured)} 
 /* ---- Rooms index ---- */
 $('#riList').innerHTML = SERIES.map(s=>`<li><a class="ri-row" href="#room-${s.id}"><span class="no">${s.no}.</span><span class="t">${T.room(s)}<em>${T.roomSub(s)}</em></span><span class="m">${bi(byId(s.id).length+'점', byId(s.id).length+(byId(s.id).length===1?' work':' works'))}</span></a></li>`).join('')
   + `<li><div class="ri-row soon"><span class="no">${NEXT_ROOM.no}.</span><span class="t">${bi('다음 전시실','Next room')}</span><span class="m">${bi(NEXT_ROOM.note,NEXT_ROOM.note_en)}</span></div></li>`;
+
+/* ---- Rooms index: point at a room and its work surfaces behind the list ---- */
+(()=>{ const cover = s => byId(s.id).find(w=>w.featured) || byId(s.id).find(w=>LARGE.includes(w.no)) || byId(s.id)[0];
+  const sec = $('#rooms'), list = $('#riList');
+  sec.insertAdjacentHTML('afterbegin', `<div class="ri-bg" aria-hidden="true">${SERIES.filter(s=>byId(s.id).length).map(s=>`<img data-room="${s.id}" src="${small(cover(s))}" alt="" loading="lazy" decoding="async">`).join('')}</div>`);
+  const imgs = sec.querySelectorAll('.ri-bg img');
+  const show = id => { list.classList.toggle('hovering', !!id);
+    list.querySelectorAll('a.ri-row').forEach(a=>a.classList.toggle('act', a.getAttribute('href')==='#room-'+id));
+    imgs.forEach(im=>im.classList.toggle('on', im.dataset.room===id)); };
+  if (matchMedia('(hover: hover)').matches){
+    list.querySelectorAll('a.ri-row').forEach(a=>{ const id = a.getAttribute('href').slice(6);
+      a.addEventListener('mouseenter',()=>show(id)); a.addEventListener('focus',()=>show(id)); a.addEventListener('blur',()=>show(null)); });
+    list.addEventListener('mouseleave',()=>show(null));
+  } else {
+    /* phones: the row passing the middle of the screen lights up its room */
+    let cur = null; const rows = [...list.querySelectorAll('a.ri-row')];
+    const pick = () => { const mid = innerHeight/2, r = rows.find(a=>{ const b = a.getBoundingClientRect(); return b.top < mid && b.bottom > mid; });
+      const sb = sec.getBoundingClientRect(); const id = (r && sb.top < mid && sb.bottom > mid) ? r.getAttribute('href').slice(6) : null;
+      if (id !== cur){ cur = id; show(id); } };
+    addEventListener('scroll', pick, {passive:true});
+  }
+})();
 
 /* ---- Rooms ---- */
 const captionHTML = w => `<figcaption class="caption"><span class="sym">${T.sym(w)}</span><p class="verse">${T.line(w)}</p><span class="meta"><span class="no">${no(w)}</span>${T.title(w)}${metaLine(w) ? ' · ' + metaLine(w) : ''}${w.video ? ` · <span class="mv-tag">${MV}</span>` : ''}</span>${w.note ? `<p class="anote">${T.note(w)}${SIG}</p>` : ''}</figcaption>`;
