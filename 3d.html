@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>3D 전시장 — Vantyr Archive</title>
+<meta name="description" content="Vantyr Archive의 사진을 어두운 3D 전시장에서 걸으며 봅니다.">
+<meta property="og:title" content="3D 전시장 — Vantyr Archive">
+<meta property="og:description" content="어두운 전시장을 천천히 걸으며 사진을 봅니다.">
+<meta property="og:image" content="https://vantyr-archive.vercel.app/photos/og.jpg">
+<meta property="og:type" content="website">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#0D1017">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Noto+Serif+KR:wght@300;400&display=swap">
+<style>
+/* The Hall — the same photographs, hung in a dark room you can walk through. */
+:root{
+  --paper:#0D1017; --ink:#E8E4DC; --ink-soft:#9AA0AC; --sky:#93BCE6; --line:rgba(232,228,220,.14);
+  --f-display:"Cormorant Garamond","Times New Roman",serif;
+  --f-kr:"Noto Serif KR","AppleMyungjo","Batang",serif;
+  --ease:cubic-bezier(.22,1,.36,1);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%;background:#07090d;color:var(--ink);font-family:var(--f-kr);font-weight:300;-webkit-font-smoothing:antialiased;word-break:keep-all;overflow:hidden;overscroll-behavior:none}
+html[lang="ko"] .t-en, html[lang="en"] .t-ko{display:none!important}
+canvas#c{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+canvas#c.drag{cursor:grabbing}
+canvas#c.hot{cursor:zoom-in}
+.small{font-family:var(--f-display);font-size:13px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-soft)}
+button{font:inherit;color:inherit}
+a{color:inherit}
+
+/* film grain, as on the main site */
+.grain{position:fixed;inset:-60px;z-index:5;pointer-events:none;opacity:.06;mix-blend-mode:overlay;animation:grain 1.2s steps(5) infinite;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+@keyframes grain{0%{transform:translate(0,0)}25%{transform:translate(-22px,14px)}50%{transform:translate(18px,-26px)}75%{transform:translate(-12px,-8px)}100%{transform:translate(0,0)}}
+.vignette{position:fixed;inset:0;z-index:4;pointer-events:none;background:radial-gradient(ellipse 80% 75% at 50% 50%,transparent 55%,rgba(4,5,8,.72))}
+
+/* top bar */
+.ui{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;justify-content:space-between;align-items:center;gap:16px;
+  padding:calc(18px + env(safe-area-inset-top,0px)) clamp(16px,4vw,48px) 18px;pointer-events:none}
+.ui > *{pointer-events:auto}
+.logo{font-family:var(--f-display);font-size:22px;line-height:1;text-decoration:none;display:inline-flex;align-items:center;gap:11px;white-space:nowrap}
+.logo .lm{height:.82em;width:auto}
+.logo em{font-style:italic;color:var(--ink-soft);font-size:.8em;margin-left:2px}
+.ui .r{display:flex;align-items:center;gap:22px}
+.lng,.snd,.exit{all:unset;cursor:pointer;font-family:var(--f-display);font-size:14px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft);white-space:nowrap;transition:color .4s}
+.lng:hover,.snd:hover,.exit:hover{color:var(--ink)}
+.lng span{opacity:.45} .lng i{font-style:normal;opacity:.3;margin:0 6px}
+html[lang="ko"] .lng [data-l="ko"], html[lang="en"] .lng [data-l="en"]{opacity:1;color:var(--ink)}
+.snd[aria-pressed="true"]{color:var(--ink)}
+.exit{border-bottom:1px solid var(--line);padding-bottom:3px}
+.snd .ic{display:none;font-size:16px;letter-spacing:0}
+
+/* where you are */
+.where{position:fixed;left:clamp(16px,4vw,48px);bottom:calc(26px + env(safe-area-inset-bottom,0px));z-index:20;display:grid;gap:6px;pointer-events:none;transition:opacity .8s}
+.where b{font-weight:400;font-size:18px}
+.where em{font-family:var(--f-display);font-style:italic;color:var(--ink-soft);margin-left:10px;font-size:17px}
+.progress{position:fixed;right:clamp(16px,4vw,48px);bottom:calc(32px + env(safe-area-inset-bottom,0px));z-index:20;width:min(180px,30vw);height:1px;background:var(--line);pointer-events:none}
+.progress i{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--sky);box-shadow:0 0 10px rgba(147,188,230,.6)}
+.hint{position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:20;font-size:13px;color:var(--ink-soft);letter-spacing:.04em;text-align:center;pointer-events:none;transition:opacity 1.2s;white-space:nowrap}
+
+/* the plate: what you read when you stand in front of a work */
+.plate{position:fixed;z-index:25;right:clamp(16px,4vw,56px);top:50%;transform:translateY(-50%);width:min(340px,36vw);display:grid;gap:14px;
+  padding:26px 26px 22px;background:rgba(9,11,16,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line);
+  opacity:0;visibility:hidden;transition:opacity .9s var(--ease),visibility .9s}
+.plate.on{opacity:1;visibility:visible}
+.plate .sym{color:var(--sky);font-size:15px;letter-spacing:.06em}
+.plate .sym .t-en{font-family:var(--f-display);font-style:italic;font-size:19px}
+.plate .verse{margin:0;font-size:19px;line-height:1.7;font-weight:400}
+.plate .meta{font-size:12.5px;color:var(--ink-soft);line-height:1.7}
+.plate .meta .no{font-family:var(--f-display);font-style:italic;margin-right:8px}
+.plate .note{margin:4px 0 0;padding-top:14px;border-top:1px solid var(--line);font-size:14px;line-height:1.9;color:var(--ink-soft)}
+.plate .sig{display:block;margin-top:6px;font-family:var(--f-display);font-style:italic;font-size:17px;color:var(--ink)}
+.plate nav{display:flex;justify-content:space-between;align-items:center;margin-top:6px;padding-top:14px;border-top:1px solid var(--line)}
+.plate nav button{all:unset;cursor:pointer;font-family:var(--f-display);font-size:14px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);transition:color .4s;padding:4px 0}
+.plate nav button:hover{color:var(--ink)}
+
+/* entrance */
+.enter{position:fixed;inset:0;z-index:40;background:#07090d;display:grid;place-content:center;justify-items:center;text-align:center;gap:22px;cursor:pointer;transition:opacity 1.6s var(--ease),visibility 1.6s}
+.enter.out{opacity:0;visibility:hidden}
+.enter h1{margin:0;font-weight:400;font-size:clamp(34px,5vw,60px);line-height:1.2}
+.enter h1 em{display:block;font-family:var(--f-display);font-style:italic;font-weight:400;font-size:.55em;color:var(--ink-soft);margin-top:10px;letter-spacing:.03em}
+.enter .bar{width:min(320px,60vw);height:1px;background:rgba(232,228,220,.1);position:relative;margin-top:10px}
+.enter .bar i{position:absolute;left:50%;top:0;bottom:0;width:0;transform:translateX(-50%);background:linear-gradient(90deg,transparent,var(--sky),var(--ink),var(--sky),transparent);box-shadow:0 0 18px rgba(147,188,230,.6);transition:width .8s var(--ease)}
+.enter p{margin:0;font-size:14px;color:var(--ink-soft);line-height:1.8;max-width:30ch}
+.enter .go{font-size:15px;letter-spacing:.24em;color:var(--ink);opacity:0;transition:opacity 1.2s;margin-top:14px}
+.enter.ready .go{opacity:1;animation:breathe 2.4s ease-in-out infinite}
+@keyframes breathe{50%{opacity:.45}}
+.nogl{position:fixed;inset:0;z-index:50;background:var(--paper);display:grid;place-content:center;text-align:center;gap:16px;padding:24px}
+
+@media (max-width:760px){
+  .logo span{display:none}
+  .ui .r{gap:16px}
+  .snd span.l{display:none} .snd .ic{display:inline}
+  .plate{left:12px;right:12px;top:auto;bottom:calc(12px + env(safe-area-inset-bottom,0px));transform:none;width:auto;padding:18px 18px 14px;gap:10px;max-height:46svh;overflow:auto}
+  .plate .verse{font-size:16px}
+  .plate .note{font-size:13px}
+  .hint{white-space:normal;width:86vw;bottom:auto;top:calc(76px + env(safe-area-inset-top,0px))}
+  .where b{font-size:16px} .where em{display:block;margin:2px 0 0}
+}
+@media (prefers-reduced-motion: reduce){.grain{animation:none}}
+</style>
+</head>
+<body>
+<canvas id="c" aria-label="3D 전시장: 끌거나 스크롤해서 걷고, 사진을 누르면 다가갑니다"></canvas>
+<div class="vignette" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="ui">
+  <a class="logo" href="index.html" aria-label="Vantyr Archive 본 전시로"><svg class="lm" viewBox="16 66 168 82" aria-hidden="true"><path d="M62 108a38 38 0 0 1 76 0z" fill="currentColor"/><rect x="16" y="107" width="168" height="2.2" fill="#93BCE6"/><rect x="74" y="120" width="52" height="3" rx="1.5" fill="currentColor" fill-opacity=".55"/><rect x="84" y="131" width="32" height="2.8" rx="1.4" fill="currentColor" fill-opacity=".35"/><rect x="93" y="141" width="14" height="2.6" rx="1.3" fill="currentColor" fill-opacity=".2"/></svg><span>Vantyr Archive <em>— The Hall</em></span></a>
+  <div class="r">
+    <button class="lng" type="button" aria-label="언어 바꾸기 / Change language"><span data-l="ko">KO</span><i>/</i><span data-l="en">EN</span></button>
+    <button class="snd" type="button" aria-pressed="false" aria-label="배경음악 / Sound"><span class="l">Sound</span><span class="ic" aria-hidden="true">♪</span></button>
+    <a class="exit" href="index.html#rooms"><span class="t-ko">나가기</span><span class="t-en">Exit</span></a>
+  </div>
+</header>
+
+<div class="where" id="where" aria-live="polite"><span class="small" id="whereNo"></span><div><b id="whereT"></b><em id="whereE"></em></div></div>
+<div class="progress" aria-hidden="true"><i id="prog"></i></div>
+<div class="hint" id="hint"><span class="t-ko">스크롤하거나 끌어서 걸어 보세요 · 사진을 누르면 다가가요</span><span class="t-en">Scroll or drag to walk · tap a photograph to step closer</span></div>
+
+<aside class="plate" id="plate" aria-live="polite">
+  <span class="sym" id="pSym"></span>
+  <p class="verse" id="pLine"></p>
+  <span class="meta" id="pMeta"></span>
+  <p class="note" id="pNote" hidden></p>
+  <nav><button type="button" id="pPrev">‹ <span class="t-ko">이전</span><span class="t-en">Prev</span></button><button type="button" id="pBack"><span class="t-ko">물러서기</span><span class="t-en">Step back</span></button><button type="button" id="pNext"><span class="t-ko">다음</span><span class="t-en">Next</span> ›</button></nav>
+</aside>
+
+<div class="enter" id="enter" role="button" tabindex="0" aria-label="3D 전시장 들어가기">
+  <span class="small">Vantyr Archive</span>
+  <h1><span class="t-ko">3D 전시장</span><span class="t-en">The Hall</span><em><span class="t-ko">The Hall</span><span class="t-en">3D 전시장</span></em></h1>
+  <div class="bar"><i id="bar"></i></div>
+  <p><span class="t-ko">어두운 전시장을 천천히 걸으며 사진을 봅니다.</span><span class="t-en">Walk slowly through a dark hall of photographs.</span></p>
+  <span class="go"><span class="t-ko">들어가기</span><span class="t-en">Enter</span></span>
+</div>
+<div class="nogl" id="nogl" hidden><p><span class="t-ko">이 기기에서는 3D 전시장을 열 수 없어요.</span><span class="t-en">The Hall can’t open on this device.</span></p><a href="index.html" class="small"><span class="t-ko">본 전시로 가기</span><span class="t-en">Back to the exhibition</span></a></div>
+
+<script src="data.js"></script>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+
+/* ---------- language & data ---------- */
+let LANG = 'ko';
+try { LANG = localStorage.getItem('va-lang') || ((navigator.language||'ko').toLowerCase().startsWith('ko') ? 'ko' : 'en'); } catch(e){}
+document.documentElement.lang = LANG;
+const $ = s => document.querySelector(s);
+const pad = (n,l=3) => String(n).padStart(l,'0');
+const E = w => { const e = EN[w.no] || []; return {title:e[0], place:e[1], sym:e[2], line:e[3], note:e[4]}; };
+const L = (ko,en) => LANG === 'en' && en ? en : ko;
+const bi = (ko,en) => en ? `<span class="t-ko">${ko}</span><span class="t-en">${en}</span>` : ko;
+const byId = id => WORKS.filter(w=>w.series===id).sort((a,b)=>a.no-b.no);
+const base = w => w.src.replace(/\.jpg$/,'');
+const mobile = matchMedia('(max-width:760px), (pointer:coarse)').matches;
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const texSrc = w => w.hd ? `${base(w)}-${mobile ? 800 : 1200}.webp` : w.src;
+
+/* ---------- renderer ---------- */
+const canvas = $('#c');
+let renderer;
+try { renderer = new THREE.WebGLRenderer({canvas, antialias:true, powerPreference:'high-performance'}); }
+catch(e){ $('#nogl').hidden = false; $('#enter').remove(); throw e; }
+renderer.setPixelRatio(Math.min(devicePixelRatio, mobile ? 1.5 : 1.75));
+renderer.setSize(innerWidth, innerHeight, false);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+const BG = 0x07090d;
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(BG);
+scene.fog = new THREE.Fog(BG, 7, 30);
+const camera = new THREE.PerspectiveCamera(mobile ? 62 : 52, innerWidth/innerHeight, .05, 80);
+const EYE = 1.62;
+
+/* ---------- small helpers: gradient textures drawn once ---------- */
+function radialTex(inner='rgba(255,255,255,1)', mid=.35){
+  const c = document.createElement('canvas'); c.width = c.height = 256; const g = c.getContext('2d');
+  const gr = g.createRadialGradient(128,128,0,128,128,128);
+  gr.addColorStop(0, inner); gr.addColorStop(mid, 'rgba(255,255,255,.35)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = gr; g.fillRect(0,0,256,256); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+function beamTex(){
+  const c = document.createElement('canvas'); c.width = 64; c.height = 256; const g = c.getContext('2d');
+  const gr = g.createLinearGradient(0,0,0,256); gr.addColorStop(0,'rgba(255,255,255,.9)'); gr.addColorStop(1,'rgba(255,255,255,0)');
+  g.fillStyle = gr; g.fillRect(0,0,64,256);
+  const gx = g.createLinearGradient(0,0,64,0); gx.addColorStop(0,'rgba(0,0,0,1)'); gx.addColorStop(.5,'rgba(0,0,0,0)'); gx.addColorStop(1,'rgba(0,0,0,1)');
+  g.globalCompositeOperation = 'destination-out'; g.fillStyle = gx; g.fillRect(0,0,64,256);
+  return new THREE.CanvasTexture(c);
+}
+const POOL = radialTex(), BEAM = beamTex();
+const lift = (hex, k) => { const c = new THREE.Color(hex); c.multiplyScalar(k); return c; };
+const warm = hex => new THREE.Color('#fff3e2').lerp(new THREE.Color(hex), .45);
+
+/* text drawn onto a canvas, then hung as a plane */
+const FONT_KR = '"Noto Serif KR", "AppleMyungjo", serif', FONT_D = '"Cormorant Garamond", "Times New Roman", serif';
+function textTex(draw, w, h){
+  const c = document.createElement('canvas'); c.width = w; c.height = h; const g = c.getContext('2d');
+  draw(g, w, h); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
+}
+function wrap(g, text, maxW){ const out = []; let line = '';
+  const tokens = LANG === 'ko' ? text.split(/(\s+)/) : text.split(/(\s+)/);
+  tokens.forEach(t=>{ const test = line + t; if (g.measureText(test).width > maxW && line.trim()){ out.push(line.trim()); line = t.trimStart(); } else line = test; });
+  if (line.trim()) out.push(line.trim()); return out; }
+
+/* ---------- the hall ---------- */
+const W = mobile ? 7.2 : 8.8, H = 5.2, STEP = 3.9, GAP = 8;   // hall width, height, distance between works, space between rooms
+const hall = new THREE.Group(); scene.add(hall);
+const sequence = [];       // every work in walking order
+const roomsZ = [];         // where each room starts / ends
+let z = -2;
+
+const ROOMS = SERIES.filter(s=>byId(s.id).length);
+ROOMS.forEach((s,ri)=>{
+  const start = z; z -= GAP;
+  const ws = byId(s.id);
+  ws.forEach((w,i)=>{ const side = i % 2 ? 1 : -1; sequence.push({w, s, side, z: z - i*STEP*0.5 - (i%2 ? STEP*.5 : 0) }); });
+  // keep left and right in a gentle stagger: each side advances by STEP
+  const zs = sequence.filter(q=>q.s===s); zs.forEach((q,i)=>{ q.z = z - i*(STEP*.55); });
+  z = zs[zs.length-1].z - STEP*1.1;
+  roomsZ.push({s, start, end:z});
+});
+const END = z - 4;
+
+/* walls, floor and ceiling — each room gets its own wall colour */
+const floorMat = new THREE.MeshStandardMaterial({color:0x0b0d12, roughness:.42, metalness:.15});
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(W, Math.abs(END)+20), floorMat);
+floor.rotation.x = -Math.PI/2; floor.position.set(0,0,(END-6)/2); hall.add(floor);
+const ceil = new THREE.Mesh(new THREE.PlaneGeometry(W, Math.abs(END)+20), new THREE.MeshLambertMaterial({color:0x06070a}));
+ceil.rotation.x = Math.PI/2; ceil.position.set(0,H,(END-6)/2); hall.add(ceil);
+function wallSeg(z0, z1, color){
+  const len = Math.abs(z1 - z0), mid = (z0 + z1)/2;
+  const mat = new THREE.MeshLambertMaterial({color});
+  [-1,1].forEach(side=>{ const m = new THREE.Mesh(new THREE.PlaneGeometry(len, H), mat);
+    m.position.set(side*W/2, H/2, mid); m.rotation.y = -side*Math.PI/2; hall.add(m); });
+}
+wallSeg(6, roomsZ[0].start, lift(WALL.base, 2.4));
+roomsZ.forEach(r=>wallSeg(r.start, r.end, lift(WALL[r.s.id] || WALL.base, 2.6)));
+wallSeg(roomsZ[roomsZ.length-1].end, END-4, lift(WALL.base, 2.4));
+// end walls
+const endWall = (zz, face) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(W, H), new THREE.MeshLambertMaterial({color:lift(WALL.base,2.2)})); m.position.set(0,H/2,zz); m.rotation.y = face; hall.add(m); return m; };
+endWall(6, Math.PI); const farWall = endWall(END-4, 0);
+// a thin skirting line of light along the floor, like the horizon
+const skirt = new THREE.MeshBasicMaterial({color:0x93BCE6, transparent:true, opacity:.22, fog:true});
+[-1,1].forEach(side=>{ const m = new THREE.Mesh(new THREE.PlaneGeometry(Math.abs(END)+10, .012), skirt); m.position.set(side*(W/2-.01), .06, (END)/2); m.rotation.y = -side*Math.PI/2; hall.add(m); });
+
+/* room titles: a lintel across the hall where each room begins, and its opening line on the wall */
+const lintels = [];
+function drawLintel(r){
+  const s = r.s;
+  return textTex((g,w,h)=>{
+    g.fillStyle = 'rgba(0,0,0,0)'; g.clearRect(0,0,w,h);
+    g.textAlign = 'center'; g.fillStyle = 'rgba(154,160,172,.9)'; g.font = `500 34px ${FONT_D}`;
+    g.letterSpacing = '8px'; g.fillText(`ROOM ${s.no}`, w/2, 62);
+    g.letterSpacing = '0px'; g.fillStyle = '#E8E4DC'; g.font = `400 84px ${LANG==='en' ? FONT_D : FONT_KR}`;
+    g.fillText(LANG==='en' ? s.en : s.title, w/2, 168);
+    g.fillStyle = 'rgba(154,160,172,.95)'; g.font = `italic 400 46px ${FONT_D}`; g.fillText(LANG==='en' ? s.title : s.en, w/2, 232);
+    g.font = `300 34px ${FONT_KR}`; g.fillStyle = 'rgba(232,228,220,.72)';
+    const ep = L(s.epigraph, s.epigraph_en); wrap(g, ep, w*.8).slice(0,2).forEach((ln,i)=>g.fillText(ln, w/2, 312 + i*50));
+  }, 1600, 420);
+}
+roomsZ.forEach(r=>{
+  const mat = new THREE.MeshBasicMaterial({map:drawLintel(r), transparent:true, fog:true});
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(4.8, 1.26), mat);
+  m.position.set(0, 2.25, r.start - GAP*.55); hall.add(m);
+  // a faint doorway frame of light
+  const door = new THREE.MeshBasicMaterial({color:0x93BCE6, transparent:true, opacity:.12});
+  [[-W/2+.6,'v'],[W/2-.6,'v']].forEach(([x])=>{ const p = new THREE.Mesh(new THREE.PlaneGeometry(.014, H*.8), door); p.position.set(x, H*.4, r.start - GAP*.25); hall.add(p); });
+  const top = new THREE.Mesh(new THREE.PlaneGeometry(W-1.2, .014), door); top.position.set(0, H*.8, r.start - GAP*.25); hall.add(top);
+  lintels.push({r, mat});
+});
+
+/* the far wall: the room still to come */
+const farMat = new THREE.MeshBasicMaterial({transparent:true, fog:true});
+const drawFar = () => textTex((g,w,h)=>{ g.textAlign='center';
+  g.fillStyle='rgba(154,160,172,.9)'; g.font=`500 30px ${FONT_D}`; g.letterSpacing='8px'; g.fillText(`ROOM ${NEXT_ROOM.no}`, w/2, 70);
+  g.letterSpacing='0px'; g.fillStyle='rgba(232,228,220,.85)'; g.font=`400 64px ${LANG==='en'?FONT_D:FONT_KR}`; g.fillText(L('다음 전시실','Next room'), w/2, 160);
+  g.fillStyle='rgba(154,160,172,.9)'; g.font=`300 32px ${FONT_KR}`; g.fillText(L(NEXT_ROOM.note, NEXT_ROOM.note_en), w/2, 230); }, 1400, 280);
+farMat.map = drawFar();
+const far = new THREE.Mesh(new THREE.PlaneGeometry(4.4, .88), farMat); far.position.set(0, 2.1, END-3.98); hall.add(far);
+const farPool = new THREE.Mesh(new THREE.PlaneGeometry(7, 4.5), new THREE.MeshBasicMaterial({map:POOL, color:0x93BCE6, transparent:true, opacity:.16, blending:THREE.AdditiveBlending, depthWrite:false}));
+farPool.position.set(0, 2.2, END-3.97); hall.add(farPool);
+
+/* ---------- the works ---------- */
+const MAT_C = 0xE7E2D8;
+const pickables = [];
+const loader = new THREE.TextureLoader();
+const maxAniso = renderer.capabilities.getMaxAnisotropy();
+sequence.forEach((q,i)=>{
+  const {w, side} = q;
+  const large = LARGE.includes(w.no);
+  const base_ = large ? 2.5 : 1.95;
+  let pw = w.r >= 1 ? Math.min(base_ * w.r, large ? 4.2 : 3.2) : base_ * w.r, ph = pw / w.r;
+  if (ph > (large ? 2.75 : 2.25)){ ph = large ? 2.75 : 2.25; pw = ph * w.r; }
+  const mat = Math.max(pw,ph) * .07;
+  const g = new THREE.Group();
+  const x = side * (W/2 - .03);
+  g.position.set(x, EYE + .1, q.z); g.rotation.y = side < 0 ? Math.PI/2 : -Math.PI/2;
+  hall.add(g);
+  // shadow box, ivory mat, then the print
+  const box = new THREE.Mesh(new THREE.BoxGeometry(pw+mat*2+.05, ph+mat*2+.05, .05), new THREE.MeshLambertMaterial({color:0x0c0e13}));
+  box.position.z = .025; g.add(box);
+  const matM = new THREE.Mesh(new THREE.PlaneGeometry(pw+mat*2, ph+mat*2), new THREE.MeshBasicMaterial({color:MAT_C, fog:true}));
+  matM.material.color.multiplyScalar(.86); matM.position.z = .052; g.add(matM);
+  const photoMat = new THREE.MeshBasicMaterial({color:0x1a1d24, fog:true});
+  const photo = new THREE.Mesh(new THREE.PlaneGeometry(pw, ph), photoMat); photo.position.z = .054; g.add(photo);
+  // the light: a pool on the wall in the work's own colour, a beam from the ceiling, a pool on the floor
+  const tint = warm(GLOW[w.no] || '#93BCE6');
+  const wallPool = new THREE.Mesh(new THREE.PlaneGeometry((pw+mat*2)*2.3, (ph+mat*2)*2.1), new THREE.MeshBasicMaterial({map:POOL, color:tint, transparent:true, opacity:.44, blending:THREE.AdditiveBlending, depthWrite:false}));
+  wallPool.position.set(0, .25, .01); g.add(wallPool);
+  const beam = new THREE.Mesh(new THREE.PlaneGeometry(pw*1.2, H - (EYE+.1) + .2), new THREE.MeshBasicMaterial({map:BEAM, color:tint, transparent:true, opacity:.10, blending:THREE.AdditiveBlending, depthWrite:false, side:THREE.DoubleSide}));
+  beam.position.set(0, (H-(EYE+.1))/2 + ph*.1, .55); beam.rotation.x = -.18; g.add(beam);
+  const fixture = new THREE.Mesh(new THREE.CircleGeometry(.07, 24), new THREE.MeshBasicMaterial({color:0xfff6ea}));
+  fixture.position.set(x - side*.9, H - .01, q.z); fixture.rotation.x = Math.PI/2; hall.add(fixture);
+  const floorPool = new THREE.Mesh(new THREE.PlaneGeometry(pw*1.6+1, 2.2), new THREE.MeshBasicMaterial({map:POOL, color:tint, transparent:true, opacity:.20, blending:THREE.AdditiveBlending, depthWrite:false}));
+  floorPool.rotation.x = -Math.PI/2; floorPool.position.set(x - side*.95, .005, q.z); hall.add(floorPool);
+  // the label beside it
+  const labelMat = new THREE.MeshBasicMaterial({transparent:true, fog:true});
+  const label = new THREE.Mesh(new THREE.PlaneGeometry(.62, .34), labelMat);
+  label.position.set((pw/2 + mat + .5) * 1, -ph/2 + .12, .03); g.add(label);
+  photo.userData.idx = i; matM.userData.idx = i; pickables.push(photo, matM);
+  Object.assign(q, {g, photo, photoMat, labelMat, pw, ph, mat, loaded:false, x});
+});
+function drawLabel(q){
+  const {w} = q, e = E(w);
+  return textTex((g,W_,H_)=>{
+    g.fillStyle = 'rgba(0,0,0,0)'; g.clearRect(0,0,W_,H_);
+    g.fillStyle = 'rgba(154,160,172,.95)'; g.font = `italic 400 30px ${FONT_D}`; g.fillText(`No. ${pad(w.no)}`, 8, 40);
+    g.fillStyle = '#E8E4DC'; g.font = `400 40px ${LANG==='en'?FONT_D:FONT_KR}`;
+    wrap(g, L(w.title, e.title), W_-20).slice(0,2).forEach((ln,i)=>g.fillText(ln, 8, 98 + i*48));
+    const yy = 98 + Math.min(2, wrap(g, L(w.title, e.title), W_-20).length) * 48;
+    g.fillStyle = '#93BCE6'; g.font = LANG==='en' ? `italic 400 32px ${FONT_D}` : `400 28px ${FONT_KR}`;
+    g.fillText(LANG==='en' ? (e.sym||w.sym) : `「${w.sym}」`, 8, yy + 6);
+    g.fillStyle = 'rgba(154,160,172,.9)'; g.font = `300 22px ${FONT_KR}`;
+    const meta = [L(w.place, e.place), w.date].filter(Boolean).join(' · '); g.fillText(meta, 8, yy + 52);
+    if (w.video){ g.font = `italic 400 24px ${FONT_D}`; g.fillText(L('움직이는 사진','Moving image'), 8, yy + 84); }
+  }, 560, 310);
+}
+function drawAllText(){
+  sequence.forEach(q=>{ if (q.labelMat.map) q.labelMat.map.dispose(); q.labelMat.map = drawLabel(q); q.labelMat.needsUpdate = true; });
+  lintels.forEach(l=>{ l.mat.map.dispose(); l.mat.map = drawLintel(l.r); l.mat.needsUpdate = true; });
+  farMat.map.dispose(); farMat.map = drawFar(); farMat.needsUpdate = true;
+}
+function loadWork(q){
+  if (q.loaded) return; q.loaded = true;
+  const done = t => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = maxAniso; q.photoMat.map = t; q.photoMat.color.set(0xffffff); q.photoMat.needsUpdate = true; onLoaded(); };
+  if (q.w.video){
+    const v = Object.assign(document.createElement('video'),{muted:true, loop:true, playsInline:true, crossOrigin:'anonymous', preload:'auto'});
+    v.setAttribute('playsinline',''); v.src = `${q.w.video}${mobile ? '-720' : ''}.mp4`; q.video = v;
+    loader.load(texSrc(q.w), t=>{ done(t); v.addEventListener('playing',()=>{ const vt = new THREE.VideoTexture(v); vt.colorSpace = THREE.SRGBColorSpace; q.photoMat.map = vt; q.photoMat.needsUpdate = true; },{once:true}); }, undefined, onLoaded);
+  } else loader.load(texSrc(q.w), done, undefined, onLoaded);
+}
+
+/* light */
+scene.add(new THREE.AmbientLight(0xa9b6d4, .55));
+const lamp = new THREE.PointLight(0xfff1e0, 9, 11, 1.6); scene.add(lamp);     // the visitor's own soft light
+const hemi = new THREE.HemisphereLight(0x2a3550, 0x050608, .6); scene.add(hemi);
+
+/* ---------- walking ---------- */
+let target = 4, cur = 6, yaw = 0, pitch = 0, tYaw = 0, tPitch = 0, mouseYaw = 0, mousePitch = 0, dragYaw = 0;
+const ZMAX = 4, ZMIN = END + 1.2;
+const clampZ = v => Math.max(ZMIN, Math.min(ZMAX, v));
+let focus = -1;                      // index of the work you're standing in front of
+const fPos = new THREE.Vector3(), fLook = new THREE.Vector3(), look = new THREE.Vector3(0, EYE, -1);
+const camPos = new THREE.Vector3(0, EYE, cur);
+let entered = false, idleHint = true;
+
+addEventListener('wheel', e=>{ if (!entered) return; e.preventDefault(); if (focus >= 0){ if (Math.abs(e.deltaY) > 30) unfocus(); return; } target = clampZ(target - e.deltaY * .006); hideHint(); }, {passive:false});
+let down = null, moved = 0;
+canvas.addEventListener('pointerdown', e=>{ if (!entered) return; down = {x:e.clientX, y:e.clientY, t:target, yaw:dragYaw, id:e.pointerId}; moved = 0; canvas.setPointerCapture(e.pointerId); });
+canvas.addEventListener('pointermove', e=>{
+  if (!entered) return;
+  if (!down && e.pointerType === 'mouse'){ mouseYaw = -(e.clientX/innerWidth - .5) * .7; mousePitch = -(e.clientY/innerHeight - .5) * .22; hover(e); }
+  if (!down) return;
+  const dx = e.clientX - down.x, dy = e.clientY - down.y; moved = Math.max(moved, Math.hypot(dx,dy));
+  if (moved > 6){ canvas.classList.add('drag'); if (focus >= 0) unfocus(); hideHint();
+    target = clampZ(down.t + dy * (e.pointerType === 'mouse' ? .012 : .02));
+    dragYaw = down.yaw + dx * .0035; dragYaw = Math.max(-1.1, Math.min(1.1, dragYaw)); }
+});
+const endDrag = e=>{ if (!down) return; canvas.classList.remove('drag'); if (moved <= 6) click(e); down = null; };
+canvas.addEventListener('pointerup', endDrag); canvas.addEventListener('pointercancel', ()=>{ down = null; canvas.classList.remove('drag'); });
+addEventListener('keydown', e=>{
+  if (!entered){ if (e.key === 'Enter' || e.key === ' ') enter(); return; }
+  if (focus >= 0){ if (e.key === 'ArrowRight') step(1); else if (e.key === 'ArrowLeft') step(-1); else if (e.key === 'Escape' || e.key === 'ArrowDown' || e.key === 's') unfocus(); return; }
+  if (e.key === 'ArrowUp' || e.key === 'w'){ target = clampZ(target - 1.6); hideHint(); }
+  if (e.key === 'ArrowDown' || e.key === 's'){ target = clampZ(target + 1.6); }
+  if (e.key === 'ArrowLeft') dragYaw = Math.min(1.1, dragYaw + .25);
+  if (e.key === 'ArrowRight') dragYaw = Math.max(-1.1, dragYaw - .25);
+});
+function hideHint(){ if (idleHint){ idleHint = false; $('#hint').style.opacity = 0; } }
+
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+function pick(e){ ndc.set(e.clientX/innerWidth*2-1, -(e.clientY/innerHeight)*2+1); ray.setFromCamera(ndc, camera);
+  const hit = ray.intersectObjects(pickables, false)[0]; return hit && hit.distance < 14 ? hit.object.userData.idx : -1; }
+function hover(e){ canvas.classList.toggle('hot', pick(e) >= 0); }
+function click(e){ const i = pick(e); if (i >= 0) focusOn(i); else if (focus >= 0) unfocus(); }
+
+/* stepping up to a work */
+function focusOn(i){
+  focus = Math.max(0, Math.min(sequence.length-1, i)); const q = sequence[focus];
+  loadWork(q); hideHint();
+  const vFov = camera.fov * Math.PI / 180, need = (q.ph + q.mat*2) / .62, needW = (q.pw + q.mat*2) / (.62 * camera.aspect * (mobile ? 1 : .78));
+  const dist = Math.max(need, needW) / (2 * Math.tan(vFov/2));
+  const inward = -Math.sign(q.x);
+  const shift = mobile ? 0 : (q.pw + q.mat*2) * .32;            // leave room for the plate on the right
+  fLook.set(q.x, EYE + .1 + (mobile ? -(q.ph*.28) : 0), q.z + (q.x < 0 ? -shift : shift));
+  fPos.set(q.x + inward * Math.min(dist, W/2 + 1.6), EYE + .05, fLook.z);
+  target = clampZ(q.z);
+  showPlate(q);
+}
+function step(d){ focusOn(focus + d); }
+function unfocus(){ if (focus < 0) return; const q = sequence[focus]; focus = -1; target = clampZ(q.z + .6); dragYaw = 0; $('#plate').classList.remove('on'); }
+function showPlate(q){
+  const {w} = q, e = E(w);
+  $('#pSym').innerHTML = bi(`「${w.sym}」`, e.sym);
+  $('#pLine').innerHTML = bi(w.line, e.line);
+  const meta = [w.place, w.date].filter(Boolean).join(' · '), metaE = [e.place||w.place, w.date].filter(Boolean).join(' · ');
+  $('#pMeta').innerHTML = `<span class="no">No. ${pad(w.no)}</span>${bi(w.title, e.title)}${meta ? ' · ' + bi(meta, metaE) : ''}`;
+  const n = $('#pNote'); n.hidden = !w.note; n.innerHTML = w.note ? bi(w.note, e.note) + '<span class="sig">— Vantyr</span>' : '';
+  $('#plate').classList.add('on');
+}
+$('#pPrev').addEventListener('click', ()=>step(-1));
+$('#pNext').addEventListener('click', ()=>step(1));
+$('#pBack').addEventListener('click', unfocus);
+
+/* ---------- where you are ---------- */
+let curRoom = null;
+function updateWhere(){
+  const r = roomsZ.find(r=>cur <= r.start - GAP*.35 && cur > r.end) || null;
+  if (r !== curRoom){ curRoom = r; const el = $('#where');
+    el.style.opacity = 0; setTimeout(()=>{ if (r){ $('#whereNo').textContent = `Room ${r.s.no}`; $('#whereT').textContent = L(r.s.title, r.s.en); $('#whereE').textContent = L(r.s.en, r.s.title); }
+      else { $('#whereNo').textContent = ''; $('#whereT').textContent = ''; $('#whereE').textContent = ''; } el.style.opacity = r ? 1 : 0; }, 500); }
+  $('#prog').style.width = (Math.min(1, Math.max(0, (ZMAX - cur) / (ZMAX - ZMIN))) * 100).toFixed(1) + '%';
+}
+
+/* ---------- textures load as you approach ---------- */
+let loadedCount = 0; const FIRST = Math.min(6, sequence.length);
+function onLoaded(){ loadedCount++; $('#bar').style.width = Math.min(100, loadedCount / FIRST * 100) + '%';
+  if (loadedCount >= FIRST) $('#enter').classList.add('ready'); }
+sequence.slice(0, FIRST).forEach(loadWork);
+setTimeout(()=>$('#enter').classList.add('ready'), 6000);   // never keep anyone waiting
+
+/* ---------- sound (same track as the exhibition) ---------- */
+const audio = Object.assign(new Audio('music/track.mp3'),{loop:true, volume:0, preload:'auto'});
+let soundOn = false, fadeT;
+function setSound(on){ soundOn = on; $('.snd').setAttribute('aria-pressed', on); clearInterval(fadeT);
+  if (on) audio.play().catch(()=>{});
+  const to = on ? .26 : 0; fadeT = setInterval(()=>{ const v = audio.volume + (to - audio.volume) * .06; audio.volume = Math.max(0, Math.min(1, v));
+    if (Math.abs(audio.volume - to) < .005){ audio.volume = to; clearInterval(fadeT); if (!on) audio.pause(); } }, 50); }
+$('.snd').addEventListener('click', ()=>setSound(!soundOn));
+
+/* ---------- language ---------- */
+$('.lng').addEventListener('click', ()=>{ LANG = LANG === 'ko' ? 'en' : 'ko'; document.documentElement.lang = LANG; try { localStorage.setItem('va-lang', LANG); } catch(e){} drawAllText(); curRoom = undefined; updateWhere(); if (focus >= 0) showPlate(sequence[focus]); });
+
+/* ---------- entering ---------- */
+function enter(){ if (entered) return; entered = true; $('#enter').classList.add('out'); setSound(true); target = 1.5; setTimeout(()=>{ if (idleHint) $('#hint').style.opacity = 1; }, 1800); }
+$('#enter').addEventListener('click', enter);
+$('#hint').style.opacity = 0;
+
+/* fonts first, so the labels are drawn in the right typeface */
+(document.fonts ? Promise.race([Promise.all([document.fonts.load(`400 40px ${FONT_KR}`), document.fonts.load(`italic 400 30px ${FONT_D}`), document.fonts.load(`300 22px ${FONT_KR}`)]), new Promise(r=>setTimeout(r,2500))]) : Promise.resolve()).then(drawAllText);
+drawAllText();
+
+/* ---------- the loop ---------- */
+const clock = new THREE.Clock();
+const qTmp = new THREE.Vector3();
+function tick(){
+  const dt = Math.min(.05, clock.getDelta()), k = 1 - Math.pow(.0016, dt);   // frame-rate independent easing
+  if (focus >= 0){
+    camPos.lerp(fPos, 1 - Math.pow(.02, dt)); look.lerp(fLook, 1 - Math.pow(.015, dt)); cur = camPos.z;
+  } else {
+    cur += (target - cur) * k;
+    // your gaze drifts toward the work you are passing
+    let bias = 0; sequence.forEach(q=>{ const d = Math.abs(q.z - cur); if (d < 3.2) bias += -Math.sign(q.x) * (1 - d/3.2) * (mobile ? .78 : .42) * (q.z < cur ? 1 : .6); });
+    tYaw = Math.max(-1.25, Math.min(1.25, mouseYaw + dragYaw + (reduce ? 0 : bias)));
+    tPitch = mousePitch;
+    yaw += (tYaw - yaw) * (1 - Math.pow(.05, dt)); pitch += (tPitch - pitch) * (1 - Math.pow(.05, dt));
+    const breathe = reduce ? 0 : Math.sin(clock.elapsedTime * .8) * .012;
+    const want = qTmp.set(0, EYE + breathe, cur);
+    camPos.lerp(want, 1 - Math.pow(.03, dt));
+    look.lerp(qTmp.set(camPos.x + Math.sin(yaw) * -4, EYE + Math.tan(pitch) * 4 - .05, camPos.z - Math.cos(yaw) * 4), 1 - Math.pow(.02, dt));
+  }
+  camera.position.copy(camPos); camera.lookAt(look);
+  lamp.position.set(camPos.x, H - .6, camPos.z - 1.2);
+  // load what's ahead; play the moving image only when near
+  sequence.forEach(q=>{ const d = Math.abs(q.z - cur); if (d < 26) loadWork(q); if (q.video){ if (d < 10 && q.video.paused) q.video.play().catch(()=>{}); else if (d >= 12 && !q.video.paused) q.video.pause(); } });
+  updateWhere();
+  renderer.render(scene, camera);
+  requestAnimationFrame(tick);
+}
+addEventListener('resize', ()=>{ camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight, false); });
+tick();
+window.__hall = {sequence, focusOn, enter, get cur(){return cur;}, set target(v){ target = v; }};
+</script>
+</body>
+</html>
