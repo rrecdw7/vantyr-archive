@@ -105,6 +105,8 @@ main,footer,.hero{position:relative;z-index:1}
 .logo{font-family:var(--f-display);font-size:24px;line-height:1;text-decoration:none;letter-spacing:.02em;display:inline-flex;align-items:center;gap:12px}
 .lm{height:.82em;width:auto;flex:none;color:var(--ink);overflow:visible}
 .lm-foot{height:46px;display:block;margin-bottom:-14px}
+.lm-foot .fs,.lm-foot .fz,.lm-foot .fr{transform-box:fill-box;transform-origin:50% 50%}
+.room-open .ch,.room-open .wd{display:inline-block;white-space:pre}
 .logo,.lng,.snd{white-space:nowrap}
 @media (max-width:520px){.logo{font-size:20px;gap:9px}.nav-r{gap:16px!important}.snd > span:last-child{display:none}}
 .nav-r{display:flex;align-items:center;gap:clamp(18px,3vw,40px)}
@@ -372,7 +374,7 @@ footer small{color:var(--ink-soft);font-size:13px}
 </main>
 
 <footer class="wrap">
-  <svg class="lm lm-foot" viewBox="16 66 168 82" aria-hidden="true"><path d="M62 108a38 38 0 0 1 76 0z" fill="currentColor"/><rect x="16" y="107" width="168" height="2.2" fill="var(--sky)"/><rect x="74" y="120" width="52" height="3" rx="1.5" fill="currentColor" fill-opacity=".55"/><rect x="84" y="131" width="32" height="2.8" rx="1.4" fill="currentColor" fill-opacity=".35"/><rect x="93" y="141" width="14" height="2.6" rx="1.3" fill="currentColor" fill-opacity=".2"/></svg>
+  <svg class="lm lm-foot" viewBox="16 66 168 82" aria-hidden="true"><defs><clipPath id="footsky"><rect x="0" y="0" width="200" height="108.2"/></clipPath></defs><g clip-path="url(#footsky)"><path class="fs" d="M62 108a38 38 0 0 1 76 0z" fill="currentColor"/></g><rect class="fz" x="16" y="107" width="168" height="2.2" fill="var(--sky)"/><rect class="fr" x="74" y="120" width="52" height="3" rx="1.5" fill="currentColor" fill-opacity=".55"/><rect class="fr" x="84" y="131" width="32" height="2.8" rx="1.4" fill="currentColor" fill-opacity=".35"/><rect class="fr" x="93" y="141" width="14" height="2.6" rx="1.3" fill="currentColor" fill-opacity=".2"/></svg>
   <p class="big">Vantyr <em>Archive</em></p>
   <div class="contact">
     <span class="small">Contact</span>
@@ -399,6 +401,8 @@ footer small{color:var(--ink-soft);font-size:13px}
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
 <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/motion@11.11.13/dist/motion.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/juliangarnier/anime@v4.4.1/dist/bundles/anime.umd.min.js"></script>
 <script src="data.js"></script>
 <script>
 
@@ -526,6 +530,18 @@ function renderCatalogue(){
     el.innerHTML = list.map(w=>`<figure class="g-item ${slot(w)}" style="--r:${w.r}" data-no="${w.no}" data-set="cat" tabindex="0" role="button" aria-label="${w.title} 크게 보기"><div class="frame"><img ${img(w,'(max-width:900px) 92vw, 50vw')} alt="${w.alt}" loading="lazy"></div><figcaption><span class="no">${no(w)}</span><b>${T.title(w)}</b><span class="s">${T.sym(w)}</span>${w.video ? `<span class="s mv-tag">${MV}</span>` : ''}</figcaption></figure>`).join('');
   }
   hydrate(el);
+  springIn(el);
+}
+/* Motion: the overview and the list arrive with a soft spring, one after another */
+function springIn(el){
+  const M = window.Motion; if (!M || reduce || el.className === 'grid') return;
+  try {
+    const items = [...el.children]; items.forEach(i=>{ i.style.opacity = 0; });
+    let stop = null, done = false;
+    stop = M.inView(el, ()=>{ if (done) return; done = true;
+      M.animate(items, {opacity:[0,1], y:[26,0]}, {delay:M.stagger(.028), type:'spring', stiffness:110, damping:21});
+      if (stop) stop(); }, {amount:.04});
+  } catch(e){ [...el.children].forEach(i=>{ i.style.opacity = ''; }); }
 }
 function bindSeg(seg, set){
   seg.addEventListener('click', e=>{ const b = e.target.closest('button'); if(!b || b.getAttribute('aria-pressed')==='true') return;
@@ -552,7 +568,10 @@ function openLB(set, n){ lbSet = set; lbI = Math.max(0, set.findIndex(w=>w.no===
   showLB(); lb.hidden = false; if(window.lenis) lenis.stop(); $('#lbClose').focus();
   if(hasGSAP && !reduce) gsap.fromTo('#lbImg, #lbVid',{opacity:0,filter:'blur(8px)'},{opacity:1,filter:'blur(0px)',duration:1.4,ease:'power2.out'}); }
 function closeLB(){ $('#lbVid').pause(); lb.hidden = true; if(window.lenis) lenis.start(); lastFocus && lastFocus.focus(); }
-function step(d){ lbI = (lbI + d + lbSet.length) % lbSet.length; showLB(); if(hasGSAP && !reduce) gsap.fromTo('#lbImg, #lbVid',{opacity:0},{opacity:1,duration:1,ease:'power2.out'}); }
+function step(d){ lbI = (lbI + d + lbSet.length) % lbSet.length; showLB();
+  if (reduce) return;
+  if (window.Motion){ try { Motion.animate([$('#lbImg'), $('#lbVid')], {opacity:[0,1], x:[d*42,0]}, {type:'spring', stiffness:120, damping:22}); return; } catch(e){} }
+  if (hasGSAP) gsap.fromTo('#lbImg, #lbVid',{opacity:0},{opacity:1,duration:1,ease:'power2.out'}); }
 const setFor = el => el.dataset.set==='cat' ? visible() : byId(el.dataset.set);
 document.addEventListener('click', e=>{ const v = e.target.closest('[data-view], .g-item, .l-row, .s-item'); if(!v) return; const f = v.closest('[data-no]'); if(!f) return; openLB(setFor(f), +f.dataset.no); });
 document.addEventListener('keydown', e=>{
@@ -570,6 +589,48 @@ document.addEventListener('click', e=>{ const b = e.target.closest('.lng'); if (
   LANG = LANG === 'ko' ? 'en' : 'ko'; document.documentElement.lang = LANG;
   try { localStorage.setItem('va-lang', LANG); } catch(err){}
   window.safeRefresh && setTimeout(safeRefresh, 50); });
+
+/* ---- Anime.js: room titles are written letter by letter; the logo at the end rises like the opening ---- */
+(()=>{ const A = window.anime; if (!A || reduce) return;
+  try {
+    const splitInto = (el, cls, byWord) => { if (!el) return []; const tw = document.createTreeWalker(el, NodeFilter.SHOW_TEXT), nodes = [];
+      while (tw.nextNode()) if (tw.currentNode.nodeValue.trim()) nodes.push(tw.currentNode);
+      nodes.forEach(n=>{ const parts = byWord ? n.nodeValue.split(/(\s+)/) : [...n.nodeValue], frag = document.createDocumentFragment();
+        parts.forEach(t=>{ if (!t) return; if (/^\s+$/.test(t)){ frag.append(t); return; } const s = document.createElement('span'); s.className = cls; s.textContent = t; frag.append(s); });
+        n.replaceWith(frag); });
+      return [...el.querySelectorAll('.'+cls)]; };
+    document.querySelectorAll('.room-open').forEach(ro=>{
+      const sm = ro.querySelector('.small'), chs = splitInto(ro.querySelector('h2'),'ch',false), wds = splitInto(ro.querySelector('blockquote'),'wd',true);
+      A.set([sm, ...chs, ...wds], {opacity:0});
+      const io = new IntersectionObserver(es=>{ if (!es[0].isIntersecting) return; io.disconnect();
+        A.createTimeline({defaults:{ease:'outExpo'}})
+          .add(sm, {opacity:[0,1], duration:1400})
+          .add(chs, {opacity:[0,1], translateY:['.5em','0em'], filter:['blur(10px)','blur(0px)'], duration:1700, delay:A.stagger(60)}, '-=1000')
+          .add(wds, {opacity:[0,1], translateY:['.35em','0em'], filter:['blur(6px)','blur(0px)'], duration:1500, delay:A.stagger(75)}, '-=1200');
+      }, {threshold:.3}); io.observe(ro);
+    });
+    const foot = document.querySelector('.lm-foot');
+    if (foot){ const sun = foot.querySelector('.fs'), hz = foot.querySelector('.fz'), rf = foot.querySelectorAll('.fr');
+      A.set(hz, {scaleX:0}); A.set(sun, {translateY:44}); A.set(rf, {scaleX:0, opacity:0});
+      const io = new IntersectionObserver(es=>{ if (!es[0].isIntersecting) return; io.disconnect();
+        A.createTimeline()
+          .add(hz, {scaleX:[0,1], duration:1600, ease:'inOutQuart'})
+          .add(sun, {translateY:[44,0], duration:2400, ease:'outCubic'}, '-=900')
+          .add(rf, {scaleX:[0,1], opacity:[0,1], duration:1200, delay:A.stagger(180), ease:'outQuad'}, '-=1500');
+      }, {threshold:.6}); io.observe(foot);
+    }
+  } catch(e){ document.querySelectorAll('.room-open .ch, .room-open .wd, .room-open .small, .lm-foot *').forEach(x=>{ x.style.opacity = ''; x.style.transform = ''; }); }
+})();
+
+/* ---- Motion: buttons and prints give a little under your finger, then spring back ---- */
+(()=>{ const M = window.Motion; if (!M || reduce) return;
+  const SEL = '.lng, .snd, .seg button, .lb-nav button, #lbClose, .s-item, .l-row, .copy';
+  const press = {type:'spring', stiffness:520, damping:34};
+  let held = null;
+  document.addEventListener('pointerdown', e=>{ const b = e.target.closest(SEL); if (!b) return; held = b; try { M.animate(b, {scale:.96}, press); } catch(err){} });
+  const release = ()=>{ if (!held) return; try { M.animate(held, {scale:1}, {type:'spring', stiffness:260, damping:20}); } catch(err){} held = null; };
+  ['pointerup','pointercancel','dragstart'].forEach(t=>document.addEventListener(t, release));
+})();
 
 /* ---- Copy email ---- */
 $('#copyMail').addEventListener('click', async e=>{
@@ -721,7 +782,7 @@ if (hasGSAP && !reduce){
   gsap.from('.ri-row',{opacity:0,duration:1.6,stagger:.15,ease:'power2.out',scrollTrigger:{trigger:'.ri-list',start:'top 85%',once:true}});
 
   /* Rooms: each opening line and each work fades in as it arrives and out as it leaves */
-  document.querySelectorAll('.room-open').forEach(el=>{
+  if (!window.anime) document.querySelectorAll('.room-open').forEach(el=>{
     gsap.fromTo(el.children,{opacity:0,filter:'blur(10px)'},{opacity:1,filter:'blur(0px)',stagger:.25,ease:'none',scrollTrigger:{trigger:el,start:'top 75%',end:'center center',scrub:1}});
   });
   document.querySelectorAll('.piece').forEach(el=>{

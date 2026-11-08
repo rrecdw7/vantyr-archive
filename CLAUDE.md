@@ -22,7 +22,12 @@ tools/add_photo.py  새 사진 보정·변환 도구
 README.md      사용자용 한국어 안내
 ```
 
-라이브러리: GSAP 3.12.5 + ScrollTrigger (jsdelivr), Lenis 1.1.13 (unpkg).
+라이브러리 (모두 CDN, 하나가 못 불러와져도 사이트는 그대로 동작하게 작성):
+- GSAP 3.12.5 + ScrollTrigger — 오프닝, 스크롤에 따른 등장, 벽 색·빛 번짐
+- Lenis 1.1.13 — 부드러운 스크롤
+- Anime.js 4.4.1 (jsdelivr gh) — 전시실 제목 글자 하나씩, 맨 아래 로고 모션(수평선→해→빛줄)
+- Motion 11.11.13 (UMD, 전역 Motion) — 모아보기·목록 스프링 등장, 크게 보기 이전/다음 스프링, 버튼 누름 반응
+- Bklit UI는 React+shadcn 차트 라이브러리라 이 사이트(빌드 없는 HTML)에는 쓰지 않기로 함
 글꼴: Cormorant Garamond(영문·이탤릭), Noto Serif KR(한글).
 색: 배경 `#0D1017`, 글자 `#E8E4DC`, 보조 `#9AA0AC`, 강조(하나만) `#93BCE6`, 액자 매트 `#E7E2D8`.
 

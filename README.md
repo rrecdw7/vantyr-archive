@@ -77,7 +77,7 @@ const LARGE = [7,1,13,28,26];               // 화면 가득 크게 거는 작�
 
 ## 쓰는 기술
 
-GSAP 3.12.5 + ScrollTrigger (애니메이션), Lenis 1.1.13 (부드러운 스크롤),
+GSAP 3.12.5 + ScrollTrigger (애니메이션), Lenis 1.1.13 (부드러운 스크롤), Anime.js 4.4.1 (글자·로고 모션), Motion 11.11.13 (스프링 반응),
 Google Fonts — Cormorant Garamond, Noto Serif KR.
 빌드 과정 없는 HTML 한 장이라, 파일만 바꾸면 바로 반영돼요.
 
