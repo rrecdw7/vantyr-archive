@@ -14,7 +14,7 @@ vantyr-archive/
 ## 작품 추가하기
 
 1. 사진을 `photos/` 폴더에 넣어요. 파일 이름은 영어 소문자로 (예: `photos/rainyday.jpg`)
-2. `data.js`에서 `const WORKS = [` 를 찾아, 맨 아래에 한 줄을 추가해요. (본 사이트와 3D 전시장이 함께 써요)
+2. `data.js`에서 `const WORKS = [` 를 찾아, 맨 아래에 한 줄을 추가해요. 
 
 ```js
 {no:19, series:'night', src:'photos/rainyday.jpg', r:.75, title:'비 오는 밤', place:'동네 길', date:'2026.11.02', sym:'젖음', line:'비가 오면 길은 하늘을 한 번 더 비춘다.', note:'우산 없이 걷던 밤', alt:'비에 젖은 밤길과 가로등'},
@@ -104,9 +104,7 @@ Google Fonts — Cormorant Garamond, Noto Serif KR.
 - `icon-512.png` — 프로필 사진 등 정사각형 아이콘
 사이트 탭 아이콘은 `favicon.svg`, `favicon-32.png`, 휴대폰 홈 화면 아이콘은 `apple-touch-icon.png`예요.
 
-## 3D 전시장
+## 사진 준비 도구
 
-`3d.html` — 같은 작품들이 어두운 3D 전시장에 걸려요 (Three.js). 메뉴의 `3D`나 전시실 목록 아래 링크로 들어가요.
-- 작품 정보는 `data.js`를 그대로 읽어서, 사진을 추가하면 3D 전시장에도 자동으로 걸려요.
-- 전시실 벽 색은 `WALL`, 사진마다 벽에 번지는 빛 색은 `GLOW` (data.js)로 정해요. 새 작품의 `GLOW`가 없으면 하늘색으로 비춰요.
-- 3D용 가벼운 사진은 `photos/이름-800.webp` (휴대폰용).
+`python tools/add_photo.py 원본.jpg 이름 [--mode film|night]` — 사이트와 같은 색감으로 보정하고, 필요한 크기의 사진과 흐린 미리보기를 만들어 줘요.
+(필요: `pip install pillow numpy opencv-python`) 자세한 작업 순서는 `CLAUDE.md`에 있어요.

@@ -159,10 +159,6 @@ main,footer,.hero{position:relative;z-index:1}
 .ri-row .m{font-size:13px;color:var(--ink-soft)}
 a.ri-row:hover .t{transform:translateX(10px)}
 .ri-row.soon{opacity:.38}
-.hall-link{margin-top:56px;display:grid;justify-items:center;gap:10px;text-decoration:none;color:var(--ink-soft);transition:color .5s}
-.hall-link b{font-weight:400;font-size:clamp(17px,1.6vw,20px);color:var(--ink)}
-.hall-link i{font-style:normal;display:inline-block;transition:transform .8s var(--ease)}
-.hall-link:hover i{transform:translateX(8px)}
 
 /* ---------- A room: its opening line, then one work per screen ---------- */
 .room{position:relative;overflow-x:clip}
@@ -329,7 +325,7 @@ footer small{color:var(--ink-soft);font-size:13px}
   <div class="nav-r"><ul class="small">
     <li><a href="#about">About</a></li>
     <li><a href="#rooms">Rooms</a></li>
-    <li><a href="#works">Works</a></li><li><a href="3d.html">3D</a></li>
+    <li><a href="#works">Works</a></li>
   </ul><button class="lng small" type="button" aria-label="언어 바꾸기 / Change language"><span data-l="ko">KO</span><i>/</i><span data-l="en">EN</span></button><button class="snd small" type="button" aria-pressed="false" aria-label="배경음악 켜기"><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><span>Sound</span></button></div>
 </div>
 
@@ -340,7 +336,7 @@ footer small{color:var(--ink-soft);font-size:13px}
     <div class="nav-r"><ul class="small">
       <li><a href="#about">About</a></li>
       <li><a href="#rooms">Rooms</a></li>
-      <li><a href="#works">Works</a></li><li><a href="3d.html">3D</a></li>
+      <li><a href="#works">Works</a></li>
     </ul><button class="lng small" type="button" aria-label="언어 바꾸기 / Change language"><span data-l="ko">KO</span><i>/</i><span data-l="en">EN</span></button><button class="snd small" type="button" aria-pressed="false" aria-label="배경음악 켜기"><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><span>Sound</span></button></div>
   </nav>
   <div class="hero-text wrap">
@@ -359,7 +355,6 @@ footer small{color:var(--ink-soft);font-size:13px}
   <section class="rooms-index wrap" id="rooms" aria-label="전시실">
     <span class="small">Rooms</span>
     <ol class="ri-list" id="riList"></ol>
-    <a class="hall-link" href="3d.html"><span class="small">The Hall</span><b><span class="t-ko">3D 전시장으로 걸어 들어가기</span><span class="t-en">Walk into the 3D hall</span> <i aria-hidden="true">→</i></b></a>
   </section>
 
   <div id="roomsWrap"></div>
